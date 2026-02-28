@@ -1,0 +1,66 @@
+import { useState, useEffect } from 'react'
+import LandingPage from './pages/LandingPage.jsx'
+import SettingsPage from './pages/SettingsPage.jsx'
+import GamePage from './pages/GamePage.jsx'
+
+function App() {
+  const [currentPage, setCurrentPage] = useState('landing')
+
+  // Apply dark mode on app load from localStorage
+  useEffect(() => {
+    const savedDarkMode = localStorage.getItem('darkMode') === 'true'
+    const root = document.documentElement
+    if (savedDarkMode) {
+      root.style.setProperty('--color-background', '#1a1a1a')
+      root.style.setProperty('--color-surface', '#2d2d2d')
+      root.style.setProperty('--color-text-primary', '#f1f5f9')
+      root.style.setProperty('--color-text-secondary', '#94a3b8')
+      root.style.setProperty('--color-border-light', '#404040')
+    } else {
+      root.style.setProperty('--color-background', '#f8fafc')
+      root.style.setProperty('--color-surface', '#ffffff')
+      root.style.setProperty('--color-text-primary', '#0f172a')
+      root.style.setProperty('--color-text-secondary', '#475569')
+      root.style.setProperty('--color-border-light', '#e2e8f0')
+    }
+  }, [])
+
+  const navigateTo = (page) => {
+    setCurrentPage(page)
+  }
+
+  const renderPage = () => {
+    switch (currentPage) {
+      case 'landing':
+        return <LandingPage onNavigate={navigateTo} />
+      case 'settings':
+        return <SettingsPage onBack={() => navigateTo('landing')} />
+      case 'game':
+        return <GamePage onBack={() => navigateTo('landing')} />
+      case 'leaderboard':
+        // Leaderboard page will be created later
+        return (
+          <div style={{ padding: '2rem', textAlign: 'center' }}>
+            <h1>Leaderboard</h1>
+            <p>Coming soon...</p>
+            <button onClick={() => navigateTo('landing')}>Back to Home</button>
+          </div>
+        )
+      case 'faq':
+        // FAQ page will be created later
+        return (
+          <div style={{ padding: '2rem', textAlign: 'center' }}>
+            <h1>FAQ</h1>
+            <p>Coming soon...</p>
+            <button onClick={() => navigateTo('landing')}>Back to Home</button>
+          </div>
+        )
+      default:
+        return <LandingPage onNavigate={navigateTo} />
+    }
+  }
+
+  return renderPage()
+}
+
+export default App

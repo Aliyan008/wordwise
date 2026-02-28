@@ -1,0 +1,96 @@
+.keyboard {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 6px;
+  padding: 16px 12px;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.keyboard-key {
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  border: 2px solid var(--color-border-light);
+  background-color: var(--color-surface);
+  color: var(--color-text-primary);
+  font-size: 0.9rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 150ms ease-out;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
+  flex-shrink: 0;
+}
+
+.keyboard-key:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.12);
+}
+
+.keyboard-key:active:not(:disabled) {
+  transform: translateY(0) scale(0.95);
+}
+
+.keyboard-key-default {
+  background-color: var(--color-surface);
+  border-color: var(--color-border-light);
+}
+
+.keyboard-key-correct {
+  background-color: var(--color-success);
+  border-color: var(--color-success);
+  color: #ffffff;
+}
+
+.keyboard-key-wrong {
+  background-color: var(--color-error);
+  border-color: var(--color-error);
+  color: #ffffff;
+}
+
+.keyboard-key-disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  background-color: var(--color-border-light);
+}
+
+@media (min-width: 400px) {
+  .keyboard {
+    gap: 8px;
+  }
+
+  .keyboard-key {
+    width: 40px;
+    height: 40px;
+    font-size: 1rem;
+  }
+}
+
+@media (min-width: 600px) {
+  .keyboard {
+    gap: 10px;
+    padding: 20px;
+  }
+
+  .keyboard-key {
+    width: 44px;
+    height: 44px;
+    font-size: 1.1rem;
+  }
+}
+
+@media (min-width: 768px) {
+  .keyboard {
+    gap: 12px;
+  }
+
+  .keyboard-key {
+    width: 48px;
+    height: 48px;
+    font-size: 1.15rem;
+  }
+}

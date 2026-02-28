@@ -1,0 +1,32 @@
+:root {
+  /* Core typography */
+  --font-family-base: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI',
+    sans-serif;
+
+  /* Light theme palette */
+  --color-primary: #f97316; /* orange */
+  --color-primary-hover: #ea580c;
+  --color-secondary: #06b6d4;
+  --color-background: #f8fafc;
+  --color-surface: #ffffff;
+  --color-text-primary: #0f172a;
+  --color-text-secondary: #475569;
+  --color-success: #22c55e;
+  --color-error: #ef4444;
+  --color-warning: #f59e0b;
+  --color-border-light: #e2e8f0;
+  --color-border-dark: #1f2937;
+
+  /* Shadows */
+  --shadow-soft: 0 18px 40px rgba(15, 23, 42, 0.08);
+  --shadow-logo: 0 12px 24px rgba(249, 115, 22, 0.35);
+  --shadow-button: 0 14px 30px rgba(249, 115, 22, 0.35);
+  --shadow-button-hover: 0 18px 38px rgba(249, 115, 22, 0.4);
+
+  /* Dark theme palette (reserved for future toggle) */
+  --color-background-dark: #1a1a1a;
+  --color-surface-dark: #2d2d2d;
+  --color-text-primary-dark: #f1f5f9;
+  --color-text-secondary-dark: #94a3b8;
+}
+

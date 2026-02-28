@@ -1,0 +1,79 @@
+.lives-display {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0;
+  margin-left: auto;
+}
+
+.lives-label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+.lives-hearts {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+}
+
+.lives-hearts-two-rows {
+  flex-direction: column;
+  gap: 2px;
+}
+
+.lives-hearts-row {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+}
+
+.heart {
+  font-size: 1.25rem;
+  transition: transform 200ms ease-out, opacity 200ms ease-out;
+  line-height: 1;
+}
+
+.lives-hearts-two-rows .heart {
+  font-size: 1rem;
+}
+
+.heart-full {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.heart-empty {
+  opacity: 0.3;
+  transform: scale(0.9);
+  filter: grayscale(100%);
+}
+
+.lives-count {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--color-text-secondary);
+}
+
+@media (min-width: 600px) {
+  .lives-display {
+    gap: 10px;
+  }
+
+  .lives-label {
+    font-size: 0.95rem;
+  }
+
+  .heart {
+    font-size: 1.5rem;
+  }
+
+  .lives-hearts-two-rows .heart {
+    font-size: 1.25rem;
+  }
+
+  .lives-count {
+    font-size: 0.9rem;
+  }
+}
