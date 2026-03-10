@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import LandingPage from './pages/LandingPage.jsx'
+import AuthPage from './pages/AuthPage.jsx'
 import SettingsPage from './pages/SettingsPage.jsx'
 import GamePage from './pages/GamePage.jsx'
 
@@ -33,6 +34,8 @@ function App() {
     switch (currentPage) {
       case 'landing':
         return <LandingPage onNavigate={navigateTo} />
+      case 'auth':
+        return <AuthPage onAuthSuccess={() => navigateTo('landing')} />
       case 'settings':
         return <SettingsPage onBack={() => navigateTo('landing')} />
       case 'game':

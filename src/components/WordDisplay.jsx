@@ -1,15 +1,8 @@
 import './WordDisplay.css'
 
 function WordDisplay({ word, guessedLetters }) {
-  const length = word?.length || 0
-  const maxTilesBeforeShrink = 10
-  const scale =
-    length > maxTilesBeforeShrink
-      ? Math.max(0.75, maxTilesBeforeShrink / length)
-      : 1
-
   return (
-    <div className="word-display" style={{ '--word-scale': scale }}>
+    <div className="word-display">
       {word.split('').map((letter, index) => {
         const isRevealed = guessedLetters.includes(letter.toUpperCase())
         return (

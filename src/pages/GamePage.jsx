@@ -113,28 +113,23 @@ const getLivesForDifficulty = (diff) => {
 }
 
 function GamePage({ onBack }) {
-  // Get difficulty from localStorage
-  const getInitialDifficulty = () => {
-    return localStorage.getItem('difficulty') || 'Normal'
-  }
-
-  const [difficulty, setDifficulty] = useState(getInitialDifficulty)
+  const [difficulty, setDifficulty] = useState('Normal')
   const [currentWord, setCurrentWord] = useState('')
   const [currentCategory, setCurrentCategory] = useState('')
   const [guessedLetters, setGuessedLetters] = useState([])
-  const initialLives = getLivesForDifficulty(getInitialDifficulty())
+  const initialLives = getLivesForDifficulty('Normal')
   const [lives, setLives] = useState(initialLives)
   const [maxLives, setMaxLives] = useState(initialLives)
   const [score, setScore] = useState(0)
   const [gameStatus, setGameStatus] = useState('playing') // 'playing' | 'won' | 'lost'
 
-  const startNewGame = (difficultyToUse = null) => {
+  // Single source of truth: always read latest difficulty from localStorage
+  const startNewGame = () => {
     const savedDifficulty = localStorage.getItem('difficulty') || 'Normal'
-    const diffToUse = difficultyToUse || savedDifficulty
-    setDifficulty(diffToUse)
+    setDifficulty(savedDifficulty)
 
     const wordsForDifficulty =
-      WORDS_BY_DIFFICULTY[diffToUse] || WORDS_BY_DIFFICULTY.Normal
+      WORDS_BY_DIFFICULTY[savedDifficulty] || WORDS_BY_DIFFICULTY.Normal
     const randomEntry =
       wordsForDifficulty[Math.floor(Math.random() * wordsForDifficulty.length)]
 
@@ -142,7 +137,7 @@ function GamePage({ onBack }) {
     setCurrentCategory(randomEntry.category)
     setGuessedLetters([])
 
-    const livesForDifficulty = getLivesForDifficulty(diffToUse)
+    const livesForDifficulty = getLivesForDifficulty(savedDifficulty)
     setMaxLives(livesForDifficulty)
     setLives(livesForDifficulty)
     setGameStatus('playing')
@@ -183,13 +178,7 @@ function GamePage({ onBack }) {
 
   // Initialize game
   useEffect(() => {
-    // Re-read difficulty in case it changed
-    const savedDifficulty = localStorage.getItem('difficulty') || 'Normal'
-    setDifficulty(savedDifficulty)
-    const livesForDifficulty = getLivesForDifficulty(savedDifficulty)
-    setMaxLives(livesForDifficulty)
-    setLives(livesForDifficulty)
-    startNewGame(savedDifficulty)
+    startNewGame()
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 

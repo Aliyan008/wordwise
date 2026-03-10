@@ -5,12 +5,13 @@ function CustomButton({
   children, 
   onClick, 
   className = '', 
-  fullWidth = false 
+  fullWidth = false,
+  ...props
 }) {
   const buttonClasses = `custom-btn custom-btn-${variant} ${fullWidth ? 'custom-btn-full' : ''} ${className}`.trim()
 
   return (
-    <button className={buttonClasses} onClick={onClick}>
+    <button className={buttonClasses} onClick={onClick} {...props}>
       {children}
     </button>
   )
