@@ -1,257 +1,480 @@
-import { useState, useEffect } from 'react'
-import './GamePage.css'
-import WordDisplay from '../components/WordDisplay'
-import Keyboard from '../components/Keyboard'
+import { useEffect, useState } from 'react'
+import wordList from 'word-list-json'
 import LivesDisplay from '../components/LivesDisplay'
-import GameOverModal from '../components/GameOverModal'
 
-// Word list organized by difficulty with categories
-const WORDS_BY_DIFFICULTY = {
-  Easy: [
-    { word: 'APPLE', category: 'Fruit' },
-    { word: 'LION', category: 'Animal' },
-    { word: 'SUN', category: 'Nature' },
-    { word: 'CAR', category: 'Vehicle' },
-    { word: 'MOON', category: 'Nature' },
-    { word: 'STAR', category: 'Nature' },
-    { word: 'CAT', category: 'Animal' },
-    { word: 'DOG', category: 'Animal' },
-    { word: 'BIRD', category: 'Animal' },
-    { word: 'FISH', category: 'Animal' },
-    { word: 'TREE', category: 'Nature' },
-    { word: 'ROSE', category: 'Flower' },
-    { word: 'BOOK', category: 'Object' },
-    { word: 'BALL', category: 'Object' },
-    { word: 'CAKE', category: 'Food' },
-    { word: 'MILK', category: 'Food' },
-    { word: 'SHOE', category: 'Clothing' },
-    { word: 'HAT', category: 'Clothing' },
-    { word: 'BED', category: 'Furniture' },
-    { word: 'CHAIR', category: 'Furniture' }
-  ],
-  Normal: [
-    { word: 'BANANA', category: 'Fruit' },
-    { word: 'ORANGE', category: 'Fruit' },
-    { word: 'TIGER', category: 'Animal' },
-    { word: 'MONKEY', category: 'Animal' },
-    { word: 'PANDA', category: 'Animal' },
-    { word: 'HOUSE', category: 'Building' },
-    { word: 'TRAIN', category: 'Vehicle' },
-    { word: 'PLANE', category: 'Vehicle' },
-    { word: 'EARTH', category: 'Nature' },
-    { word: 'OCEAN', category: 'Nature' },
-    { word: 'RIVER', category: 'Nature' },
-    { word: 'MOUNTAIN', category: 'Nature' },
-    { word: 'SCHOOL', category: 'Building' },
-    { word: 'GARDEN', category: 'Place' },
-    { word: 'WINDOW', category: 'Object' },
-    { word: 'PENCIL', category: 'Object' },
-    { word: 'COOKIE', category: 'Food' },
-    { word: 'PIZZA', category: 'Food' },
-    { word: 'JACKET', category: 'Clothing' },
-    { word: 'TABLE', category: 'Furniture' }
-  ],
-  Hard: [
-    { word: 'ELEPHANT', category: 'Animal' },
-    { word: 'BICYCLE', category: 'Vehicle' },
-    { word: 'AIRPLANE', category: 'Vehicle' },
-    { word: 'COMPUTER', category: 'Technology' },
-    { word: 'TELEPHONE', category: 'Technology' },
-    { word: 'BUTTERFLY', category: 'Animal' },
-    { word: 'CHOCOLATE', category: 'Food' },
-    { word: 'ELEVATOR', category: 'Building' },
-    { word: 'LIBRARY', category: 'Building' },
-    { word: 'HOSPITAL', category: 'Building' },
-    { word: 'UNIVERSITY', category: 'Building' },
-    { word: 'ADVENTURE', category: 'Concept' },
-    { word: 'DISCOVERY', category: 'Concept' },
-    { word: 'JOURNEY', category: 'Concept' },
-    { word: 'MYSTERY', category: 'Concept' },
-    { word: 'SUNSHINE', category: 'Nature' },
-    { word: 'RAINBOW', category: 'Nature' },
-    { word: 'THUNDER', category: 'Nature' },
-    { word: 'VOLCANO', category: 'Nature' },
-    { word: 'TELESCOPE', category: 'Technology' }
-  ],
-  "you ain't that tuff 🥀": [
-    { word: 'CHALLENGE', category: 'Concept' },
-    { word: 'DIFFICULTY', category: 'Concept' },
-    { word: 'EXTRAORDINARY', category: 'Concept' },
-    { word: 'IMAGINATION', category: 'Concept' },
-    { word: 'KNOWLEDGE', category: 'Concept' },
-    { word: 'PHILOSOPHY', category: 'Concept' },
-    { word: 'REVOLUTION', category: 'Concept' },
-    { word: 'SYMPHONY', category: 'Music' },
-    { word: 'ARCHITECTURE', category: 'Building' },
-    { word: 'CIVILIZATION', category: 'Concept' },
-    { word: 'EXPERIENCE', category: 'Concept' },
-    { word: 'FOUNDATION', category: 'Concept' },
-    { word: 'GENERATION', category: 'Concept' },
-    { word: 'HISTORY', category: 'Subject' },
-    { word: 'INSPIRATION', category: 'Concept' },
-    { word: 'JOURNEY', category: 'Concept' },
-    { word: 'LANDSCAPE', category: 'Nature' },
-    { word: 'MAGNIFICENT', category: 'Concept' },
-    { word: 'NATURAL', category: 'Concept' },
-    { word: 'OPPORTUNITY', category: 'Concept' }
-  ]
+// Large local list of valid 5-letter words (no network calls)
+const ALL_WORDS = wordList
+  .filter((w) => w.length === 5 && /^[a-z]+$/i.test(w))
+  .map((w) => w.toUpperCase())
+
+// Curated easy/common words (subset for Easy difficulty)
+const EASY_WORDS = [
+  'HOUSE',
+  'TABLE',
+  'LIGHT',
+  'WATER',
+  'SMILE',
+  'BEACH',
+  'CLOCK',
+  'BREAD',
+  'APPLE',
+  'GRASS',
+  'CHAIR',
+  'BRICK',
+  'PLANT',
+  'MUSIC',
+  'RIVER',
+  'STONE',
+  'CLOUD',
+  'SUGAR',
+  'TRAIN',
+  'SWEET',
+  'SLEEP',
+  'GREEN',
+  'BLACK',
+  'WHITE',
+  'ROUND',
+  'SHAPE',
+  'FRUIT',
+  'STARS',
+  'SMELL',
+  'HAPPY',
+  'FUNNY',
+  'SMALL',
+  'LARGE',
+  'NORTH',
+  'SOUTH',
+  'EASTS',
+  'WESTS',
+  'SOUND',
+  'VOICE',
+  'HEART',
+  'WORLD',
+  'YOUTH',
+  'SHEEP',
+  'BLOOM',
+  'SANDY',
+  'SHELL',
+  'LEMON',
+  'MOUSE',
+  'TEETH',
+  'WORDS',
+  'STORY',
+  'PIZZA',
+  'BASIC',
+  'CLEAN',
+  'DREAM',
+  'LAUGH',
+  'QUIET',
+  'NOISE',
+  'SHINE',
+  'RANGE',
+  'SCORE',
+  'FRIEND',
+].filter((w) => w.length === 5)
+
+// Curated tough/uncommon words for "you ain't that tuff 🥀"
+const TOUGH_WORDS = [
+  'CRYPT',
+  'QUART',
+  'LYMPH',
+  'NYMPH',
+  'JAZZY',
+  'FUZZY',
+  'WRYLY',
+  'PHASE',
+  'PIXEL',
+  'WALTZ',
+  'RHINO',
+  'GNASH',
+  'PSALM',
+  'KNEEL',
+  'WHARF',
+  'VIXEN',
+  'ZESTY',
+  'TWIRL',
+  'SCOUR',
+  'SHRUB',
+  'PLAZA',
+  'FJORD',
+  'GLYPH',
+  'SCARF',
+  'SQUAD',
+  'QUILT',
+  'BLITZ',
+  'SMELT',
+  'SWIRL',
+  'PINCH',
+  'CRANK',
+  'SCRAP',
+  'SCOWL',
+  'FRAIL',
+  'GAUZE',
+  'HAZEL',
+  'KIOSK',
+  'KNACK',
+  'QUIRK',
+  'ROGUE',
+  'SHARD',
+  'SIEVE',
+  'SMOCK',
+  'SNUCK',
+  'SWOON',
+  'THROB',
+  'TRYST',
+  'WRYER',
+]
+
+const KEYBOARD_ROWS = ['QWERTYUIOP', 'ASDFGHJKL', 'ZXCVBNM']
+
+function pickRandomFrom(pool) {
+  return pool[Math.floor(Math.random() * pool.length)]
 }
 
-const getLivesForDifficulty = (diff) => {
-  switch (diff) {
-    case 'Easy':
-      return 4
-    case 'Normal':
-      return 6
-    case 'Hard':
-      return 8
-    case "you ain't that tuff 🥀":
-      return 8
-    default:
-      return 6
+function evaluateGuess(guess, solution) {
+  const result = Array(5).fill('absent')
+  const solutionLetters = solution.split('')
+  const used = Array(5).fill(false)
+
+  // Greens
+  for (let i = 0; i < 5; i++) {
+    if (guess[i] === solution[i]) {
+      result[i] = 'correct'
+      used[i] = true
+    }
   }
+
+  // Yellows
+  for (let i = 0; i < 5; i++) {
+    if (result[i] === 'correct') continue
+    const idx = solutionLetters.findIndex((ch, j) => ch === guess[i] && !used[j])
+    if (idx !== -1) {
+      result[i] = 'present'
+      used[idx] = true
+    }
+  }
+
+  return result
 }
 
 function GamePage({ onBack }) {
-  const [difficulty, setDifficulty] = useState('Normal')
-  const [currentWord, setCurrentWord] = useState('')
-  const [currentCategory, setCurrentCategory] = useState('')
-  const [guessedLetters, setGuessedLetters] = useState([])
-  const initialLives = getLivesForDifficulty('Normal')
-  const [lives, setLives] = useState(initialLives)
-  const [maxLives, setMaxLives] = useState(initialLives)
-  const [score, setScore] = useState(0)
+  const [solution, setSolution] = useState('APPLE')
+  const [guesses, setGuesses] = useState([])
+  const [currentGuess, setCurrentGuess] = useState('')
+  const [statuses, setStatuses] = useState([])
+  const [keyboardState, setKeyboardState] = useState({})
   const [gameStatus, setGameStatus] = useState('playing') // 'playing' | 'won' | 'lost'
+  const [message, setMessage] = useState('')
+  const [difficulty, setDifficulty] = useState('Normal')
+  const [maxGuesses, setMaxGuesses] = useState(6)
 
-  // Single source of truth: always read latest difficulty from localStorage
-  const startNewGame = () => {
+  const resetGame = () => {
     const savedDifficulty = localStorage.getItem('difficulty') || 'Normal'
     setDifficulty(savedDifficulty)
 
-    const wordsForDifficulty =
-      WORDS_BY_DIFFICULTY[savedDifficulty] || WORDS_BY_DIFFICULTY.Normal
-    const randomEntry =
-      wordsForDifficulty[Math.floor(Math.random() * wordsForDifficulty.length)]
+    let pool = ALL_WORDS
+    let allowedGuesses = 6
 
-    setCurrentWord(randomEntry.word)
-    setCurrentCategory(randomEntry.category)
-    setGuessedLetters([])
+    if (savedDifficulty === 'Easy') {
+      pool = EASY_WORDS
+      allowedGuesses = 6
+    } else if (savedDifficulty === 'Normal') {
+      pool = ALL_WORDS
+      allowedGuesses = 6
+    } else if (savedDifficulty === 'Hard') {
+      pool = ALL_WORDS
+      allowedGuesses = 5
+    } else if (savedDifficulty === "you ain't that tuff 🥀") {
+      pool = TOUGH_WORDS
+      allowedGuesses = 5
+    }
 
-    const livesForDifficulty = getLivesForDifficulty(savedDifficulty)
-    setMaxLives(livesForDifficulty)
-    setLives(livesForDifficulty)
+    setMaxGuesses(allowedGuesses)
+    setSolution(pickRandomFrom(pool))
+    setGuesses([])
+    setCurrentGuess('')
+    setStatuses([])
+    setKeyboardState({})
     setGameStatus('playing')
-    setScore(0)
   }
 
-  const handleLetterClick = (letter) => {
-    // 1. If game not playing → return
+  const handleSubmitGuess = () => {
     if (gameStatus !== 'playing') return
-
-    // 2. If letter already guessed → return
-    if (guessedLetters.includes(letter)) return
-
-    // 3. Add letter to guessedLetters
-    const updatedGuessed = [...guessedLetters, letter]
-    setGuessedLetters(updatedGuessed)
-
-    // 4. If letter NOT in word → decrease lives by 1 (functional update)
-    if (!currentWord.includes(letter)) {
-      setLives((prevLives) => {
-        const newLives = Math.max(prevLives - 1, 0)
-        if (newLives === 0) {
-          setGameStatus('lost')
-        }
-        return newLives
-      })
+    if (currentGuess.length !== 5) {
+      setMessage('Guess must be 5 letters.')
       return
     }
 
-    // Extra: check for win when all letters are guessed
-    const wordLetters = currentWord.split('')
-    const allGuessed = wordLetters.every((ch) => updatedGuessed.includes(ch))
-    if (allGuessed) {
+    const guess = currentGuess.toUpperCase()
+    if (!WORDS.includes(guess)) {
+      setMessage('Not in word list.')
+      return
+    }
+    setMessage('')
+    const evaluation = evaluateGuess(guess, solution)
+
+    setGuesses((prev) => [...prev, guess])
+    setStatuses((prev) => [...prev, evaluation])
+
+    setKeyboardState((prev) => {
+      const next = { ...prev }
+      guess.split('').forEach((letter, idx) => {
+        const status = evaluation[idx]
+        const prevStatus = next[letter]
+        const rank = { correct: 3, present: 2, absent: 1 }
+        if (!prevStatus || rank[status] > rank[prevStatus]) {
+          next[letter] = status
+        }
+      })
+      return next
+    })
+
+    if (guess === solution) {
       setGameStatus('won')
-      setScore((prevScore) => prevScore + lives * 10)
+      setCurrentGuess('')
+      return
+    }
+
+    if (guesses.length + 1 >= 6) {
+      setGameStatus('lost')
+      setCurrentGuess('')
+      return
+    }
+
+    setCurrentGuess('')
+  }
+
+  const handleKey = (key) => {
+    if (gameStatus !== 'playing') return
+
+    if (key === 'ENTER') {
+      handleSubmitGuess()
+      return
+    }
+
+    if (key === 'BACKSPACE') {
+      setCurrentGuess((prev) => prev.slice(0, -1))
+      setMessage('')
+      return
+    }
+
+    if (key.length === 1 && key >= 'A' && key <= 'Z') {
+      setCurrentGuess((prev) => {
+        if (prev.length >= 5) return prev
+        return prev + key
+      })
+      setMessage('')
     }
   }
 
-  // Initialize game
   useEffect(() => {
-    startNewGame()
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
-
-  // Keyboard event listener (physical keyboard → trigger button click)
-  useEffect(() => {
-    const handleKeyPress = (event) => {
-      if (gameStatus !== 'playing') return
-
-      const key = event.key.toUpperCase()
-      if (key.length === 1 && key >= 'A' && key <= 'Z') {
-        const button = document.querySelector(
-          `.keyboard button[data-key=\"${key}\"]`,
-        )
-        if (button) {
-          event.preventDefault()
-          button.click()
+    const handler = (e) => {
+      if (e.key === 'Enter') {
+        e.preventDefault()
+        handleKey('ENTER')
+      } else if (e.key === 'Backspace') {
+        e.preventDefault()
+        handleKey('BACKSPACE')
+      } else {
+        const k = e.key.toUpperCase()
+        if (k.length === 1 && k >= 'A' && k <= 'Z') {
+          e.preventDefault()
+          handleKey(k)
         }
       }
     }
+    window.addEventListener('keydown', handler)
+    return () => window.removeEventListener('keydown', handler)
+  }, [gameStatus, currentGuess, guesses.length, solution])
 
-    window.addEventListener('keydown', handleKeyPress)
-    return () => {
-      window.removeEventListener('keydown', handleKeyPress)
+  const rows = Array.from({ length: maxGuesses }, (_, rowIndex) => {
+    const guess = guesses[rowIndex] || ''
+    const statusRow = statuses[rowIndex] || []
+    const isCurrent = rowIndex === guesses.length
+
+    return { guess, statusRow, isCurrent }
+  })
+
+  const getTileStyle = (status) => {
+    if (status === 'correct') {
+      return {
+        backgroundColor: 'var(--color-success)',
+        borderColor: 'var(--color-success)',
+        color: '#ffffff',
+      }
     }
-  }, [gameStatus])
+    if (status === 'present') {
+      return {
+        backgroundColor: 'var(--color-warning)',
+        borderColor: 'var(--color-warning)',
+        color: 'var(--color-text-primary)',
+      }
+    }
+    if (status === 'absent') {
+      return {
+        backgroundColor: 'var(--color-border-dark)',
+        borderColor: 'var(--color-border-dark)',
+        color: 'var(--color-text-secondary-dark)',
+      }
+    }
+    return {
+      backgroundColor: 'var(--color-surface)',
+      borderColor: 'var(--color-border-light)',
+      color: 'var(--color-text-primary)',
+    }
+  }
 
-  const correctLetters = guessedLetters.filter((letter) =>
-    currentWord.includes(letter)
-  )
-  const wrongLetters = guessedLetters.filter(
-    (letter) => !currentWord.includes(letter)
-  )
+  const getKeyStyle = (state) => {
+    if (state === 'correct') {
+      return {
+        backgroundColor: 'var(--color-success)',
+        color: '#ffffff',
+      }
+    }
+    if (state === 'present') {
+      return {
+        backgroundColor: 'var(--color-warning)',
+        color: 'var(--color-text-primary)',
+      }
+    }
+    if (state === 'absent') {
+      return {
+        backgroundColor: 'var(--color-border-dark)',
+        color: 'var(--color-text-secondary-dark)',
+      }
+    }
+    return {
+      backgroundColor: 'var(--color-surface)',
+      color: 'var(--color-text-primary)',
+    }
+  }
+
+  const livesRemaining =
+    gameStatus === 'playing' ? Math.max(maxGuesses - guesses.length, 0) : 0
 
   return (
-    <main className="game-page">
-      <div className="game-container">
-        <header className="game-header">
-          <button className="game-back-button" onClick={onBack} aria-label="Back to home">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M15 18L9 12L15 6" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
-            </svg>
+    <main className="w-full flex flex-col items-center">
+      <div className="w-full max-w-md mx-auto flex flex-col gap-4">
+        <header className="flex items-center justify-between mb-2">
+          <button
+            onClick={onBack}
+            aria-label="Back to home"
+            className="text-sm text-[color:var(--color-text-secondary)] hover:text-[color:var(--color-text-primary)]"
+          >
+            ← Back
           </button>
-          <LivesDisplay lives={lives} maxLives={maxLives} />
+          <div className="flex flex-col items-center gap-1">
+            <h1 className="text-xl font-bold tracking-wide">
+              WordWise • Daily
+            </h1>
+            <p className="text-[11px] uppercase tracking-wide text-[color:var(--color-text-secondary)]">
+              {difficulty} • {maxGuesses} guesses
+            </p>
+          </div>
+          <button
+            onClick={resetGame}
+            className="text-xs text-[color:var(--color-primary)] hover:text-[color:var(--color-primary-hover)]"
+          >
+            New
+          </button>
         </header>
 
-        <section className="game-main">
-          {difficulty === 'Easy' && currentCategory && currentWord && (
-            <div className="game-hint">
-              <span className="hint-label">Hint:</span>
-              <span className="hint-text">{currentCategory}</span>
+        <div className="flex justify-end mb-1">
+          <LivesDisplay lives={livesRemaining} maxLives={maxGuesses} />
+        </div>
+
+        <section className="grid grid-rows-6 gap-1.5 mx-auto">
+          {rows.map(({ guess, statusRow, isCurrent }, rowIdx) => (
+            <div key={rowIdx} className="grid grid-cols-5 gap-1.5">
+              {Array.from({ length: 5 }, (_, colIdx) => {
+                const letter =
+                  isCurrent && currentGuess[colIdx]
+                    ? currentGuess[colIdx]
+                    : guess[colIdx] || ''
+                const status = statusRow[colIdx] || 'empty'
+
+                return (
+                  <div
+                    key={colIdx}
+                    className="w-12 h-12 sm:w-14 sm:h-14 border flex items-center justify-center text-lg font-bold rounded-md transition-colors duration-200"
+                    style={getTileStyle(status)}
+                  >
+                    {letter}
+                  </div>
+                )
+              })}
             </div>
+          ))}
+        </section>
+
+        <section className="mt-4 flex flex-col items-center gap-1">
+          {message && (
+            <p className="mb-1 text-xs font-semibold text-[color:var(--color-error)]">
+              {message}
+            </p>
           )}
-          <WordDisplay word={currentWord} guessedLetters={guessedLetters} />
+          {KEYBOARD_ROWS.map((row) => (
+            <div key={row} className="flex justify-center gap-1">
+              {row.split('').map((letter) => {
+                const state = keyboardState[letter] || 'idle'
+                return (
+                  <button
+                    key={letter}
+                    className="px-2.5 py-2 sm:px-3 sm:py-2 rounded-md text-xs sm:text-sm font-semibold cursor-pointer select-none transition-colors duration-150 border border-[color:var(--color-border-light)]"
+                    style={getKeyStyle(state)}
+                    onClick={() => handleKey(letter)}
+                  >
+                    {letter}
+                  </button>
+                )
+              })}
+              {row === 'ZXCVBNM' && (
+                <>
+                  <button
+                    className="px-3 py-2 rounded-md text-xs sm:text-sm font-semibold border border-[color:var(--color-border-light)]"
+                    style={getKeyStyle('idle')}
+                    onClick={() => handleKey('BACKSPACE')}
+                  >
+                    ⌫
+                  </button>
+                  <button
+                    className="px-3 py-2 rounded-md text-xs sm:text-sm font-semibold border border-[color:var(--color-border-light)]"
+                    style={getKeyStyle('idle')}
+                    onClick={() => handleKey('ENTER')}
+                  >
+                    Enter
+                  </button>
+                </>
+              )}
+            </div>
+          ))}
         </section>
 
-        <section className="game-keyboard-section">
-          <Keyboard
-            onLetterClick={handleLetterClick}
-            guessedLetters={guessedLetters}
-            correctLetters={correctLetters}
-            wrongLetters={wrongLetters}
-          />
-        </section>
+        {gameStatus !== 'playing' && (
+          <section className="mt-4 text-center space-y-2">
+            <p className="text-lg font-semibold">
+              {gameStatus === 'won' ? 'Nice! You got it.' : 'Good try!'}
+            </p>
+            <p className="text-sm text-[color:var(--color-text-secondary)]">
+              The word was{' '}
+              <span className="font-mono font-bold text-[color:var(--color-primary)]">
+                {solution}
+              </span>
+              .
+            </p>
+            <button
+              onClick={resetGame}
+              className="mt-2 inline-flex items-center justify-center px-4 py-2 rounded-full text-sm font-semibold shadow-md"
+              style={{
+                backgroundColor: 'var(--color-primary)',
+                color: '#ffffff',
+              }}
+            >
+              Play again
+            </button>
+          </section>
+        )}
       </div>
-
-      <GameOverModal
-        isOpen={gameStatus !== 'playing'}
-        hasWon={gameStatus === 'won'}
-        word={currentWord}
-        score={score}
-        onPlayAgain={startNewGame}
-        onGoHome={onBack}
-      />
     </main>
   )
 }
