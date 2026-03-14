@@ -150,6 +150,16 @@ function LeaderboardPage({ onBack }) {
   return (
     <main className="leaderboard-page">
       <header className="leaderboard-header">
+        <button
+          type="button"
+          className="leaderboard-back"
+          onClick={onBack}
+          aria-label="Back to home"
+        >
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M15 18L9 12L15 6" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
+          </svg>
+        </button>
         <h1 className="leaderboard-title">Leaderboard</h1>
       </header>
 
@@ -207,11 +217,24 @@ function LeaderboardPage({ onBack }) {
               <div className="leaderboard-card-body">
                 <span className="leaderboard-username">{row.username}</span>
                 <div className="leaderboard-stats">
-                  <span className="leaderboard-wins-badge">{row.wins} wins</span>
-                  <span className="leaderboard-stat">{row.winRate.toFixed(1)}%</span>
-                  <span className="leaderboard-stat">
-                    {row.avgGuesses != null ? `Ø ${row.avgGuesses.toFixed(1)}` : 'Ø —'}
-                  </span>
+                  <div className="leaderboard-stat-item">
+                    <span className="leaderboard-stat-label">Games Played</span>
+                    <span className="leaderboard-stat-value">{row.totalGames}</span>
+                  </div>
+                  <div className="leaderboard-stat-item">
+                    <span className="leaderboard-stat-label">Wins</span>
+                    <span className="leaderboard-stat-value">{row.wins}</span>
+                  </div>
+                  <div className="leaderboard-stat-item">
+                    <span className="leaderboard-stat-label">Win Rate</span>
+                    <span className="leaderboard-stat-value">{row.winRate.toFixed(0)}%</span>
+                  </div>
+                  <div className="leaderboard-stat-item">
+                    <span className="leaderboard-stat-label">Avg Guesses</span>
+                    <span className="leaderboard-stat-value">
+                      {row.avgGuesses != null ? row.avgGuesses.toFixed(1) : '—'}
+                    </span>
+                  </div>
                 </div>
               </div>
             </li>

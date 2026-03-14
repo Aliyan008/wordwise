@@ -421,12 +421,9 @@ function GamePage({ onBack }) {
           <LivesDisplay lives={livesRemaining} maxLives={maxGuesses} />
         </div>
 
-        <section
-          className="game-grid"
-          style={{ gridTemplateRows: `repeat(${maxGuesses}, 1fr)` }}
-        >
+        <section className="game-grid">
           {rows.map(({ guess, statusRow, isCurrent }, rowIdx) => (
-            <div key={rowIdx} className="grid grid-cols-5 gap-1.5">
+            <div key={rowIdx} className="game-row">
               {Array.from({ length: 5 }, (_, colIdx) => {
                 const letter =
                   isCurrent && currentGuess[colIdx]
@@ -437,7 +434,7 @@ function GamePage({ onBack }) {
                 return (
                   <div
                     key={colIdx}
-                    className="w-12 h-12 sm:w-14 sm:h-14 border flex items-center justify-center text-lg font-bold rounded-md transition-colors duration-200"
+                    className="game-tile border flex items-center justify-center text-lg font-bold rounded-md transition-colors duration-200"
                     style={getTileStyle(status)}
                   >
                     {letter}
