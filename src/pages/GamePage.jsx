@@ -1,6 +1,8 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import wordList from 'word-list-json'
 import LivesDisplay from '../components/LivesDisplay'
+import { useAuth } from '../context/AuthContext'
+import { supabase } from '../supabaseClient'
 
 // Large local list of valid 5-letter words (no network calls)
 const ALL_WORDS = wordList
@@ -158,6 +160,7 @@ function evaluateGuess(guess, solution) {
 }
 
 function GamePage({ onBack }) {
+  const { user, profile } = useAuth() || {}
   const [solution, setSolution] = useState('APPLE')
   const [guesses, setGuesses] = useState([])
   const [currentGuess, setCurrentGuess] = useState('')
@@ -167,8 +170,10 @@ function GamePage({ onBack }) {
   const [message, setMessage] = useState('')
   const [difficulty, setDifficulty] = useState('Normal')
   const [maxGuesses, setMaxGuesses] = useState(6)
+  const hasInsertedGameRef = useRef(false)
 
   const resetGame = () => {
+    hasInsertedGameRef.current = false
     const savedDifficulty = localStorage.getItem('difficulty') || 'Normal'
     setDifficulty(savedDifficulty)
 
@@ -198,6 +203,37 @@ function GamePage({ onBack }) {
     setGameStatus('playing')
   }
 
+  // Re-read difficulty from localStorage on mount (e.g. after changing it in Settings)
+  useEffect(() => {
+    resetGame()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
+  // Insert game result into Supabase when game ends (win or loss); only when logged in and once per game
+  useEffect(() => {
+    if (gameStatus !== 'won' && gameStatus !== 'lost') return
+    if (hasInsertedGameRef.current || !user?.id || !profile?.username) return
+
+    hasInsertedGameRef.current = true
+    supabase
+      .from('games')
+      .insert({
+        user_id: user.id,
+        username: profile.username,
+        difficulty,
+        won: gameStatus === 'won',
+        guesses_used: gameStatus === 'won' ? guesses.length : null,
+        max_guesses: maxGuesses,
+      })
+      .then(({ error }) => {
+        if (error) {
+          console.error('[GamePage] failed to save game:', error)
+        } else {
+          localStorage.removeItem('wordwise_leaderboard_cache')
+        }
+      })
+  }, [gameStatus, user?.id, profile?.username, difficulty, maxGuesses, guesses.length])
+
   const handleSubmitGuess = () => {
     if (gameStatus !== 'playing') return
     if (currentGuess.length !== 5) {
@@ -206,7 +242,7 @@ function GamePage({ onBack }) {
     }
 
     const guess = currentGuess.toUpperCase()
-    if (!WORDS.includes(guess)) {
+    if (!ALL_WORDS.includes(guess)) {
       setMessage('Not in word list.')
       return
     }
@@ -235,7 +271,7 @@ function GamePage({ onBack }) {
       return
     }
 
-    if (guesses.length + 1 >= 6) {
+    if (guesses.length + 1 >= maxGuesses) {
       setGameStatus('lost')
       setCurrentGuess('')
       return
@@ -383,7 +419,10 @@ function GamePage({ onBack }) {
           <LivesDisplay lives={livesRemaining} maxLives={maxGuesses} />
         </div>
 
-        <section className="grid grid-rows-6 gap-1.5 mx-auto">
+        <section
+          className="grid gap-1.5 mx-auto"
+          style={{ gridTemplateRows: `repeat(${maxGuesses}, 1fr)` }}
+        >
           {rows.map(({ guess, statusRow, isCurrent }, rowIdx) => (
             <div key={rowIdx} className="grid grid-cols-5 gap-1.5">
               {Array.from({ length: 5 }, (_, colIdx) => {

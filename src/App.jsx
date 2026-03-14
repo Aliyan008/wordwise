@@ -3,9 +3,16 @@ import LandingPage from './pages/LandingPage.jsx'
 import AuthPage from './pages/AuthPage.jsx'
 import SettingsPage from './pages/SettingsPage.jsx'
 import GamePage from './pages/GamePage.jsx'
+import LeaderboardPage from './pages/LeaderboardPage.jsx'
+
+const VALID_ROUTES = ['landing', 'auth', 'settings', 'game', 'leaderboard', 'faq']
+const ROUTE_STORAGE_KEY = 'wordwise_route'
 
 function App() {
-  const [currentPage, setCurrentPage] = useState('landing')
+  const [currentPage, setCurrentPage] = useState(() => {
+    const saved = localStorage.getItem(ROUTE_STORAGE_KEY)
+    return VALID_ROUTES.includes(saved) ? saved : 'landing'
+  })
 
   // Apply dark mode on app load from localStorage
   useEffect(() => {
@@ -28,6 +35,7 @@ function App() {
 
   const navigateTo = (page) => {
     setCurrentPage(page)
+    localStorage.setItem(ROUTE_STORAGE_KEY, page)
   }
 
   const renderPage = () => {
@@ -41,14 +49,7 @@ function App() {
       case 'game':
         return <GamePage onBack={() => navigateTo('landing')} />
       case 'leaderboard':
-        // Leaderboard page will be created later
-        return (
-          <div style={{ padding: '2rem', textAlign: 'center' }}>
-            <h1>Leaderboard</h1>
-            <p>Coming soon...</p>
-            <button onClick={() => navigateTo('landing')}>Back to Home</button>
-          </div>
-        )
+        return <LeaderboardPage onBack={() => navigateTo('landing')} />
       case 'faq':
         // FAQ page will be created later
         return (

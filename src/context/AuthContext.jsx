@@ -3,6 +3,36 @@ import { supabase } from '../supabaseClient'
 
 const AuthContext = createContext(null)
 
+const PROFILE_CACHE_KEY = 'wordwise_profile_username'
+
+// First continuous alphabetic part of string (e.g. "faiz.khan" → "faiz", "faiz123" → "faiz")
+function firstAlphabeticPart(str) {
+  const match = (str || '').match(/^[a-zA-Z]+/)
+  return match ? match[0] : ''
+}
+
+function getCachedUsername(userId) {
+  try {
+    const raw = localStorage.getItem(PROFILE_CACHE_KEY)
+    if (!raw) return null
+    const map = JSON.parse(raw)
+    return map[userId] ?? null
+  } catch {
+    return null
+  }
+}
+
+function setCachedUsername(userId, username) {
+  try {
+    const raw = localStorage.getItem(PROFILE_CACHE_KEY) || '{}'
+    const map = JSON.parse(raw)
+    map[userId] = username
+    localStorage.setItem(PROFILE_CACHE_KEY, JSON.stringify(map))
+  } catch {
+    // ignore
+  }
+}
+
 export function AuthProvider({ children }) {
   const [session, setSession] = useState(null)
   const [profile, setProfile] = useState(null)
@@ -29,12 +59,16 @@ export function AuthProvider({ children }) {
 
     const result = await Promise.race([queryPromise, timeoutPromise])
 
+    const getFallbackUsername = () => {
+      const cached = getCachedUsername(userId)
+      if (cached) return cached
+      const localPart = emailForFallback ? emailForFallback.split('@')[0] || '' : ''
+      return firstAlphabeticPart(localPart) || 'player'
+    }
+
     if (result && result.timedOut) {
       console.warn('[Auth] loadProfile: timed out after 3s, using email fallback')
-      const fallbackUsername = emailForFallback
-        ? emailForFallback.split('@')[0] || 'player'
-        : 'player'
-      setProfile({ id: userId, username: fallbackUsername })
+      setProfile({ id: userId, username: getFallbackUsername() })
       return
     }
 
@@ -42,13 +76,11 @@ export function AuthProvider({ children }) {
 
     if (!error && data) {
       console.log('[Auth] loadProfile: success:', data)
+      setCachedUsername(userId, data.username)
       setProfile(data)
     } else {
       console.warn('[Auth] loadProfile: no profile or error, using email fallback:', error)
-      const fallbackUsername = emailForFallback
-        ? emailForFallback.split('@')[0] || 'player'
-        : 'player'
-      setProfile({ id: userId, username: fallbackUsername })
+      setProfile({ id: userId, username: getFallbackUsername() })
     }
   }
 
@@ -63,7 +95,14 @@ export function AuthProvider({ children }) {
       setSession(data.session)
       console.log('[Auth] init: session:', data.session)
       const user = data.session?.user
-      await loadProfile(user?.id ?? null, user?.email ?? null)
+      const userId = user?.id ?? null
+      // Show cached username immediately so avatar shows correct initial (e.g. F for faiz) while profile loads
+      const cachedUsername = getCachedUsername(userId)
+      if (userId && cachedUsername) {
+        setProfile({ id: userId, username: cachedUsername })
+      }
+      await loadProfile(userId, user?.email ?? null)
+      if (!mounted) return
       setLoading(false)
     }
 
@@ -75,7 +114,12 @@ export function AuthProvider({ children }) {
       console.log('[Auth] onAuthStateChange:', event, newSession)
       setSession(newSession)
       const user = newSession?.user
-      await loadProfile(user?.id ?? null, user?.email ?? null)
+      const userId = user?.id ?? null
+      const cachedUsername = getCachedUsername(userId)
+      if (userId && cachedUsername) {
+        setProfile({ id: userId, username: cachedUsername })
+      }
+      await loadProfile(userId, user?.email ?? null)
     })
 
     return () => {

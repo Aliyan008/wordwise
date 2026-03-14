@@ -118,7 +118,7 @@ function LandingPage({ onNavigate }) {
         <section className="landing-preview">
           <div className="preview-tiles">
             <div className="preview-tile">W</div>
-            <div className="preview-tile">O</div>
+            <div className="preview-tile preview-tile-present">O</div>
             <div className="preview-tile preview-tile-correct">R</div>
             <div className="preview-tile">D</div>
           </div>

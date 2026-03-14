@@ -30,15 +30,15 @@
 }
 
 .landing-avatar {
-  width: 36px;
-  height: 36px;
+  width: 42px;
+  height: 42px;
   border-radius: 999px;
   border: 2px solid var(--color-border-light);
   background-color: var(--color-surface);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 0.95rem;
+  font-size: 1.05rem;
   font-weight: 700;
   color: var(--color-text-primary);
   cursor: pointer;
@@ -53,7 +53,7 @@
 
 .landing-avatar-menu {
   position: absolute;
-  top: 44px;
+  top: 50px;
   right: 0;
   min-width: 140px;
   padding: 6px;
@@ -69,10 +69,10 @@
 .landing-avatar-menu-item {
   border: none;
   background: transparent;
-  padding: 8px 10px;
+  padding: 12px 14px;
   border-radius: 10px;
   text-align: left;
-  font-size: 0.85rem;
+  font-size: 0.95rem;
   font-weight: 500;
   color: var(--color-text-primary);
   cursor: pointer;
@@ -230,6 +230,12 @@
 .preview-tile-correct {
   background-color: var(--color-success);
   color: #ffffff;
+  border-color: transparent;
+}
+
+.preview-tile-present {
+  background-color: var(--color-warning);
+  color: var(--color-text-primary);
   border-color: transparent;
 }
 

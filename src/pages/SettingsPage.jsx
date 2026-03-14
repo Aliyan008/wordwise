@@ -47,13 +47,13 @@ function SettingsPage({ onBack }) {
   const getLivesForDifficulty = (diff) => {
     switch (diff) {
       case 'Easy':
-        return 4
+        return 6
       case 'Normal':
         return 6
       case 'Hard':
-        return 8
+        return 5
       case "you ain't that tuff 🥀":
-        return 8
+        return 5
       default:
         return 6
     }
