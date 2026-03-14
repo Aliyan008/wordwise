@@ -1,10 +1,13 @@
 .auth-page {
+  width: 100%;
   min-height: 100vh;
   min-height: 100dvh;
   display: flex;
-  align-items: center;
-  justify-content: center;
+  flex-direction: column;
+  align-items: stretch;
+  justify-content: flex-start;
   padding: 16px;
+  box-sizing: border-box;
 }
 
 .auth-label {
@@ -40,10 +43,9 @@
   margin-top: 8px;
 }
 
-/* Centered card */
+/* Full width on mobile; max-width only at 768px+ */
 .auth-card {
   width: 100%;
-  max-width: 420px;
   background-color: var(--color-background);
   border-radius: 24px;
   border: none;
@@ -229,5 +231,16 @@
 
   .auth-card-title {
     font-size: 1.7rem;
+  }
+}
+
+@media (min-width: 768px) {
+  .auth-page {
+    align-items: center;
+    justify-content: center;
+  }
+
+  .auth-card {
+    max-width: 420px;
   }
 }

@@ -1,10 +1,10 @@
 .game-page {
   display: flex;
-  align-items: center;
-  justify-content: center;
+  align-items: stretch;
+  justify-content: flex-start;
   width: 100%;
   min-height: 100vh;
-  padding: 16px 12px;
+  padding: 16px 16px;
 }
 
 .game-container {
@@ -13,6 +13,13 @@
   display: flex;
   flex-direction: column;
   gap: 20px;
+}
+
+.game-inner {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
 }
 
 .game-header {
@@ -92,6 +99,13 @@
   width: 100%;
 }
 
+.game-grid {
+  display: grid;
+  gap: 6px;
+  margin: 0 auto;
+  width: 100%;
+}
+
 @media (min-width: 600px) {
   .game-page {
     padding: 24px;
@@ -104,11 +118,18 @@
 
 @media (min-width: 768px) {
   .game-page {
+    align-items: center;
+    justify-content: center;
     padding: 32px;
   }
 
   .game-container {
     max-width: 800px;
+    margin: 0 auto;
+  }
+
+  .game-inner {
+    max-width: 28rem;
     margin: 0 auto;
   }
 }

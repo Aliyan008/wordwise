@@ -3,6 +3,7 @@ import wordList from 'word-list-json'
 import LivesDisplay from '../components/LivesDisplay'
 import { useAuth } from '../context/AuthContext'
 import { supabase } from '../supabaseClient'
+import './GamePage.css'
 
 // Large local list of valid 5-letter words (no network calls)
 const ALL_WORDS = wordList
@@ -389,8 +390,9 @@ function GamePage({ onBack }) {
     gameStatus === 'playing' ? Math.max(maxGuesses - guesses.length, 0) : 0
 
   return (
-    <main className="w-full flex flex-col items-center">
-      <div className="w-full max-w-md mx-auto flex flex-col gap-4">
+    <main className="game-page">
+      <div className="game-container">
+        <div className="game-inner">
         <header className="flex items-center justify-between mb-2">
           <button
             onClick={onBack}
@@ -420,7 +422,7 @@ function GamePage({ onBack }) {
         </div>
 
         <section
-          className="grid gap-1.5 mx-auto"
+          className="game-grid"
           style={{ gridTemplateRows: `repeat(${maxGuesses}, 1fr)` }}
         >
           {rows.map(({ guess, statusRow, isCurrent }, rowIdx) => (
@@ -513,6 +515,7 @@ function GamePage({ onBack }) {
             </button>
           </section>
         )}
+        </div>
       </div>
     </main>
   )

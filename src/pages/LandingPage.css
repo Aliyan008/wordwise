@@ -2,9 +2,10 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: flex-start;
-  min-height: 100%;
-  padding-top: 52px; /* Space so content isn’t under the fixed Log in / Sign up button */
+  justify-content: center;
+  width: 100%;
+  min-height: 100vh;
+  padding: 52px 16px 24px; /* top for fixed bar, then sides and bottom */
 }
 
 .landing-top-bar {
@@ -116,10 +117,11 @@
   background-color: transparent;
   border-radius: 0;
   box-shadow: none;
-  padding: 24px 16px;
+  padding: 24px 0;
   display: flex;
   flex-direction: column;
   gap: 24px;
+  align-items: center;
 }
 
 .landing-header {
@@ -245,7 +247,7 @@
   color: var(--color-text-secondary);
 }
 
-/* Tablet - 600px and up */
+/* Tablet - 600px and up (no max-width until 768px) */
 @media (min-width: 600px) {
   .landing-card {
     padding: 32px 24px;
@@ -263,13 +265,8 @@
     font-size: 2rem;
   }
 
-  .actions .custom-btn-full {
-    max-width: 400px;
-  }
-
   .button-pair {
     gap: 16px;
-    max-width: 400px;
   }
 
   .preview-tile {
@@ -278,11 +275,13 @@
   }
 }
 
-/* Desktop - 768px and up */
+/* Desktop - 768px and up (first breakpoint with max-width) */
 @media (min-width: 768px) {
   .landing-card {
     padding: 40px 32px;
     gap: 32px;
+    max-width: 520px;
+    margin: 0 auto;
   }
 
   .app-title {
