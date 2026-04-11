@@ -59,8 +59,43 @@
   box-shadow: none;
 }
 
+.auth-header {
+  position: relative;
+  width: 100%;
+  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 20px;
+}
+
+.auth-back-icon {
+  position: absolute;
+  left: 0;
+  top: 0;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 6px;
+  border-radius: 10px;
+  color: var(--color-text-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 150ms ease-out, transform 150ms ease-out;
+}
+
+.auth-back-icon:hover {
+  background-color: var(--color-border-light);
+  transform: translateX(-2px);
+}
+
+.auth-back-icon:active {
+  transform: scale(0.95);
+}
+
 .auth-card-title {
-  margin: 0 0 16px;
+  margin: 0;
   font-size: 1.5rem;
   font-weight: 800;
   text-align: center;
@@ -157,6 +192,14 @@
   margin-top: 4px;
   font-size: 0.8rem;
   color: var(--color-error);
+}
+
+.auth-error-form {
+  margin: 0;
+  font-size: 0.85rem;
+  line-height: 1.4;
+  color: var(--color-error);
+  text-align: center;
 }
 
 /* Divider + Google button */

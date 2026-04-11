@@ -393,125 +393,127 @@ function GamePage({ onBack }) {
     <main className="game-page">
       <div className="game-container">
         <div className="game-inner">
-        <header className="flex items-center justify-between mb-2">
-          <button
-            onClick={onBack}
-            aria-label="Back to home"
-            className="text-sm text-[color:var(--color-text-secondary)] hover:text-[color:var(--color-text-primary)]"
-          >
-            ← Back
-          </button>
-          <div className="flex flex-col items-center gap-1">
-            <h1 className="text-xl font-bold tracking-wide">
-              WordWise • Daily
-            </h1>
-            <p className="text-[11px] uppercase tracking-wide text-[color:var(--color-text-secondary)]">
-              {difficulty} • {maxGuesses} guesses
-            </p>
-          </div>
-          <button
-            onClick={resetGame}
-            className="text-xs text-[color:var(--color-primary)] hover:text-[color:var(--color-primary-hover)]"
-          >
-            New
-          </button>
-        </header>
-
-        <div className="flex justify-end mb-1">
-          <LivesDisplay lives={livesRemaining} maxLives={maxGuesses} />
-        </div>
-
-        <section className="game-grid">
-          {rows.map(({ guess, statusRow, isCurrent }, rowIdx) => (
-            <div key={rowIdx} className="game-row">
-              {Array.from({ length: 5 }, (_, colIdx) => {
-                const letter =
-                  isCurrent && currentGuess[colIdx]
-                    ? currentGuess[colIdx]
-                    : guess[colIdx] || ''
-                const status = statusRow[colIdx] || 'empty'
-
-                return (
-                  <div
-                    key={colIdx}
-                    className="game-tile border flex items-center justify-center text-lg font-bold rounded-md transition-colors duration-200"
-                    style={getTileStyle(status)}
-                  >
-                    {letter}
-                  </div>
-                )
-              })}
+          <header className="flex items-center justify-between mb-2">
+            <button
+              onClick={onBack}
+              aria-label="Back to home"
+              className="text-sm text-[color:var(--color-text-secondary)] hover:text-[color:var(--color-text-primary)]"
+            >
+              ← Back
+            </button>
+            <div className="flex flex-col items-center gap-1">
+              <h1 className="text-xl font-bold tracking-wide">
+                WordWise • Daily
+              </h1>
+              <p className="text-[11px] uppercase tracking-wide text-[color:var(--color-text-secondary)]">
+                {difficulty} • {maxGuesses} guesses
+              </p>
             </div>
-          ))}
-        </section>
+            <button
+              onClick={resetGame}
+              className="text-xs text-[color:var(--color-primary)] hover:text-[color:var(--color-primary-hover)]"
+            >
+              New
+            </button>
+          </header>
 
-        <section className="mt-4 flex flex-col items-center gap-1">
-          {message && (
-            <p className="mb-1 text-xs font-semibold text-[color:var(--color-error)]">
-              {message}
-            </p>
-          )}
-          {KEYBOARD_ROWS.map((row) => (
-            <div key={row} className="flex justify-center gap-1">
-              {row.split('').map((letter) => {
-                const state = keyboardState[letter] || 'idle'
-                return (
+          <div className="flex justify-end mb-1">
+            <LivesDisplay lives={livesRemaining} maxLives={maxGuesses} />
+          </div>
+
+          <section className="game-grid">
+            {rows.map(({ guess, statusRow, isCurrent }, rowIdx) => (
+              <div key={rowIdx} className="game-row">
+                {Array.from({ length: 5 }, (_, colIdx) => {
+                  const letter =
+                    isCurrent && currentGuess[colIdx]
+                      ? currentGuess[colIdx]
+                      : guess[colIdx] || ''
+                  const status = statusRow[colIdx] || 'empty'
+
+                  return (
+                    <div
+                      key={colIdx}
+                      className="game-tile border flex items-center justify-center text-lg font-bold rounded-md transition-colors duration-200"
+                      style={getTileStyle(status)}
+                    >
+                      {letter}
+                    </div>
+                  )
+                })}
+              </div>
+            ))}
+          </section>
+
+          <section className="mt-4 flex flex-col items-center gap-1 w-full px-1 sm:w-auto sm:px-0">
+            {message && (
+              <p className="mb-1 text-xs font-semibold text-[color:var(--color-error)]">
+                {message}
+              </p>
+            )}
+            {KEYBOARD_ROWS.map((row) => (
+              <div key={row} className="flex justify-center w-full sm:w-auto gap-1">
+                {row === 'ZXCVBNM' && (
                   <button
-                    key={letter}
-                    className="px-2.5 py-2 sm:px-3 sm:py-2 rounded-md text-xs sm:text-sm font-semibold cursor-pointer select-none transition-colors duration-150 border border-[color:var(--color-border-light)]"
-                    style={getKeyStyle(state)}
-                    onClick={() => handleKey(letter)}
-                  >
-                    {letter}
-                  </button>
-                )
-              })}
-              {row === 'ZXCVBNM' && (
-                <>
-                  <button
-                    className="px-3 py-2 rounded-md text-xs sm:text-sm font-semibold border border-[color:var(--color-border-light)]"
-                    style={getKeyStyle('idle')}
-                    onClick={() => handleKey('BACKSPACE')}
-                  >
-                    ⌫
-                  </button>
-                  <button
-                    className="px-3 py-2 rounded-md text-xs sm:text-sm font-semibold border border-[color:var(--color-border-light)]"
+                    className="flex-[1.5] sm:flex-none sm:px-3 py-3 sm:py-2 rounded-md text-xs sm:text-sm font-semibold border border-[color:var(--color-border-light)] flex justify-center items-center"
                     style={getKeyStyle('idle')}
                     onClick={() => handleKey('ENTER')}
                   >
                     Enter
                   </button>
-                </>
-              )}
-            </div>
-          ))}
-        </section>
-
-        {gameStatus !== 'playing' && (
-          <section className="mt-4 text-center space-y-2">
-            <p className="text-lg font-semibold">
-              {gameStatus === 'won' ? 'Nice! You got it.' : 'Good try!'}
-            </p>
-            <p className="text-sm text-[color:var(--color-text-secondary)]">
-              The word was{' '}
-              <span className="font-mono font-bold text-[color:var(--color-primary)]">
-                {solution}
-              </span>
-              .
-            </p>
-            <button
-              onClick={resetGame}
-              className="mt-2 inline-flex items-center justify-center px-4 py-2 rounded-full text-sm font-semibold shadow-md"
-              style={{
-                backgroundColor: 'var(--color-primary)',
-                color: '#ffffff',
-              }}
-            >
-              Play again
-            </button>
+                )}
+                {row.split('').map((letter) => {
+                  const state = keyboardState[letter] || 'idle'
+                  return (
+                    <button
+                      key={letter}
+                      className="flex-1 sm:flex-none sm:px-3 py-3 sm:py-2 rounded-md text-[13px] sm:text-sm font-semibold cursor-pointer select-none transition-colors duration-150 border border-[color:var(--color-border-light)] flex justify-center items-center"
+                      style={getKeyStyle(state)}
+                      onClick={() => handleKey(letter)}
+                    >
+                      {letter}
+                    </button>
+                  )
+                })}
+                {row === 'ZXCVBNM' && (
+                  <button
+                    className="flex-[1.5] sm:flex-none sm:px-3 py-3 sm:py-2 rounded-md text-xs sm:text-sm font-semibold border border-[color:var(--color-border-light)] flex justify-center items-center"
+                    style={getKeyStyle('idle')}
+                    onClick={() => handleKey('BACKSPACE')}
+                  >
+                    <svg xmlns="http://www.w3.org/2000/svg" height="20" viewBox="0 0 24 24" width="20" fill="currentColor">
+                      <path d="M22 3H7c-.69 0-1.23.35-1.59.88L0 12l5.41 8.11c.36.53.9.89 1.59.89h15c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H7.07L2.4 12l4.66-7H22v14zm-11.59-2L14 13.41 17.59 17 19 15.59 15.41 12 19 8.41 17.59 7 14 10.59 10.41 7 9 8.41 12.59 12 9 15.59z"></path>
+                    </svg>
+                  </button>
+                )}
+              </div>
+            ))}
           </section>
-        )}
+
+          {gameStatus !== 'playing' && (
+            <section className="mt-4 text-center space-y-2">
+              <p className="text-lg font-semibold">
+                {gameStatus === 'won' ? 'Nice! You got it.' : 'Good try!'}
+              </p>
+              <p className="text-sm text-[color:var(--color-text-secondary)]">
+                The word was{' '}
+                <span className="font-mono font-bold text-[color:var(--color-primary)]">
+                  {solution}
+                </span>
+                .
+              </p>
+              <button
+                onClick={resetGame}
+                className="mt-2 inline-flex items-center justify-center px-4 py-2 rounded-full text-sm font-semibold shadow-md"
+                style={{
+                  backgroundColor: 'var(--color-primary)',
+                  color: '#ffffff',
+                }}
+              >
+                Play again
+              </button>
+            </section>
+          )}
         </div>
       </div>
     </main>

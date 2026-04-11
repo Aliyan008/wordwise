@@ -3,9 +3,9 @@ import './AuthPage.css'
 import CustomButton from '../components/CustomButton'
 import { useAuth } from '../context/AuthContext.jsx'
 
-function AuthPage({ onAuthSuccess }) {
+function AuthPage({ onAuthSuccess, onBack }) {
   const [mode, setMode] = useState('login') // 'login' | 'signup'
-  const { signIn, signUp } = useAuth()
+  const { signIn, signUp, signInWithGoogle } = useAuth()
   const [form, setForm] = useState({
     loginEmail: '',
     loginPassword: '',
@@ -21,6 +21,15 @@ function AuthPage({ onAuthSuccess }) {
     setForm((prev) => ({ ...prev, [field]: event.target.value }))
   }
 
+  const handleGoogleSignIn = async () => {
+    setError('')
+    try {
+      await signInWithGoogle()
+    } catch (err) {
+      setError(err.message || 'Error signing in with Google.')
+    }
+  }
+
   const handleLoginSubmit = async (event) => {
     event.preventDefault()
     setError('')
@@ -32,7 +41,20 @@ function AuthPage({ onAuthSuccess }) {
       })
       onAuthSuccess?.()
     } catch (err) {
-      setError(err.message || 'Something went wrong. Please try again.')
+      const msg = (err.message || '').toLowerCase()
+      if (msg.includes('email not confirmed')) {
+        setError('Please confirm your email before logging in. Check your inbox.')
+      } else if (
+        msg.includes('invalid login') ||
+        msg.includes('invalid credentials') ||
+        msg.includes('invalid_grant')
+      ) {
+        setError(
+          "No account exists for this email, or the password is wrong. If you don't have an account yet, use Sign up to create one.",
+        )
+      } else {
+        setError(err.message || 'Something went wrong. Please try again.')
+      }
     } finally {
       setSubmitting(false)
     }
@@ -63,20 +85,38 @@ function AuthPage({ onAuthSuccess }) {
   return (
     <main className="auth-page">
       <div className="auth-card">
-        <h1 className="auth-card-title">Welcome</h1>
+        <header className="auth-header">
+          <button
+            type="button"
+            className="auth-back-icon"
+            onClick={() => onBack?.()}
+            aria-label="Back to home"
+          >
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M15 18L9 12L15 6" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+          </button>
+          <h1 className="auth-card-title">Welcome</h1>
+        </header>
 
         <div className="auth-toggle-row">
           <button
             type="button"
             className={`auth-toggle-tab ${mode === 'login' ? 'auth-toggle-tab-active' : ''}`}
-            onClick={() => setMode('login')}
+            onClick={() => {
+              setMode('login')
+              setError('')
+            }}
           >
             Log in
           </button>
           <button
             type="button"
             className={`auth-toggle-tab ${mode === 'signup' ? 'auth-toggle-tab-active' : ''}`}
-            onClick={() => setMode('signup')}
+            onClick={() => {
+              setMode('signup')
+              setError('')
+            }}
           >
             Sign up
           </button>
@@ -106,6 +146,11 @@ function AuthPage({ onAuthSuccess }) {
                   value={form.loginPassword}
                   onChange={handleChange('loginPassword')}
                 />
+                {error && (
+                  <p className="auth-error-form" role="alert">
+                    {error}
+                  </p>
+                )}
                 <CustomButton
                   type="submit"
                   variant="primary"
@@ -122,7 +167,7 @@ function AuthPage({ onAuthSuccess }) {
                   <span className="auth-divider-line" />
                 </div>
 
-                <button type="button" className="auth-google-btn">
+                <button type="button" className="auth-google-btn" onClick={handleGoogleSignIn}>
                   <span className="auth-google-icon" aria-hidden="true">
                     <svg
                       className="auth-google-svg"
@@ -213,7 +258,7 @@ function AuthPage({ onAuthSuccess }) {
                   <span className="auth-divider-line" />
                 </div>
 
-                <button type="button" className="auth-google-btn">
+                <button type="button" className="auth-google-btn" onClick={handleGoogleSignIn}>
                   <span className="auth-google-icon" aria-hidden="true">
                     <svg
                       className="auth-google-svg"
@@ -245,7 +290,7 @@ function AuthPage({ onAuthSuccess }) {
           </div>
         </div>
       </div>
-      {error && error !== 'Passwords do not match.' && (
+      {error && error !== 'Passwords do not match.' && mode === 'signup' && (
         <p className="auth-error">{error}</p>
       )}
     </main>

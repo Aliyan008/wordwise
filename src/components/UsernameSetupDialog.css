@@ -1,0 +1,29 @@
+.username-dialog-input {
+  width: 100%;
+  padding: 0.75rem;
+  border-radius: 8px;
+  border: 1px solid var(--color-border-light, #e2e8f0);
+  background-color: var(--color-background, #f8fafc);
+  color: var(--color-text-primary, #0f172a);
+  font-size: 1rem;
+  font-family: inherit;
+  box-sizing: border-box;
+}
+
+.username-dialog-input:focus {
+  outline: none;
+  border-color: #3b82f6; /* accent blue */
+}
+
+.username-dialog-error {
+  color: #ef4444;
+  font-size: 0.875rem;
+  margin: 0;
+}
+
+.username-dialog-desc {
+  margin: 0;
+  color: var(--color-text-secondary, #475569);
+  font-size: 0.95rem;
+  text-align: center;
+}

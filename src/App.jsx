@@ -1,4 +1,6 @@
 import { useState, useEffect } from 'react'
+import { useAuth } from './context/AuthContext.jsx'
+import UsernameSetupDialog from './components/UsernameSetupDialog.jsx'
 import LandingPage from './pages/LandingPage.jsx'
 import AuthPage from './pages/AuthPage.jsx'
 import SettingsPage from './pages/SettingsPage.jsx'
@@ -9,8 +11,11 @@ const VALID_ROUTES = ['landing', 'auth', 'settings', 'game', 'leaderboard', 'faq
 const ROUTE_STORAGE_KEY = 'wordwise_route'
 
 function App() {
+  const { profile, saveMissingUsername } = useAuth() || {}
+  
   const [currentPage, setCurrentPage] = useState(() => {
     const saved = localStorage.getItem(ROUTE_STORAGE_KEY)
+    if (saved === 'auth') return 'landing' // Never boot directly into the auth page
     return VALID_ROUTES.includes(saved) ? saved : 'landing'
   })
 
@@ -43,7 +48,12 @@ function App() {
       case 'landing':
         return <LandingPage onNavigate={navigateTo} />
       case 'auth':
-        return <AuthPage onAuthSuccess={() => navigateTo('landing')} />
+        return (
+          <AuthPage
+            onAuthSuccess={() => navigateTo('landing')}
+            onBack={() => navigateTo('landing')}
+          />
+        )
       case 'settings':
         return <SettingsPage onBack={() => navigateTo('landing')} />
       case 'game':
@@ -64,7 +74,15 @@ function App() {
     }
   }
 
-  return renderPage()
+  return (
+    <>
+      <UsernameSetupDialog 
+        isOpen={profile?.needsUsername === true} 
+        onSubmit={saveMissingUsername} 
+      />
+      {renderPage()}
+    </>
+  )
 }
 
 export default App
