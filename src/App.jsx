@@ -7,12 +7,14 @@ import SettingsPage from './pages/SettingsPage.jsx'
 import GamePage from './pages/GamePage.jsx'
 import LeaderboardPage from './pages/LeaderboardPage.jsx'
 import FAQPage from './pages/FAQPage.jsx'
+import ProfilePage from './pages/ProfilePage.jsx'
+import RecoveryPage from './pages/RecoveryPage.jsx'
 
-const VALID_ROUTES = ['landing', 'auth', 'settings', 'game', 'leaderboard', 'faq']
+const VALID_ROUTES = ['landing', 'auth', 'settings', 'game', 'leaderboard', 'faq', 'profile']
 const ROUTE_STORAGE_KEY = 'wordwise_route'
 
 function App() {
-  const { profile, saveMissingUsername } = useAuth() || {}
+  const { profile, saveMissingUsername, recoveryMode } = useAuth() || {}
   
   const [currentPage, setCurrentPage] = useState(() => {
     const saved = localStorage.getItem(ROUTE_STORAGE_KEY)
@@ -45,6 +47,10 @@ function App() {
   }
 
   const renderPage = () => {
+    if (recoveryMode) {
+      return <RecoveryPage />
+    }
+
     switch (currentPage) {
       case 'landing':
         return <LandingPage onNavigate={navigateTo} />
@@ -63,6 +69,8 @@ function App() {
         return <LeaderboardPage onBack={() => navigateTo('landing')} />
       case 'faq':
         return <FAQPage onBack={() => navigateTo('landing')} />
+      case 'profile':
+        return <ProfilePage onBack={() => navigateTo('landing')} />
       default:
         return <LandingPage onNavigate={navigateTo} />
     }

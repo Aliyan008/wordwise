@@ -51,7 +51,7 @@ function LandingPage({ onNavigate }) {
                   className="landing-avatar-menu-item"
                   onClick={() => {
                     setIsMenuOpen(false)
-                    onNavigate?.('settings')
+                    onNavigate?.('profile')
                   }}
                 >
                   Profile

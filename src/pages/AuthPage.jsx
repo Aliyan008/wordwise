@@ -2,10 +2,11 @@ import { useState } from 'react'
 import './AuthPage.css'
 import CustomButton from '../components/CustomButton'
 import { useAuth } from '../context/AuthContext.jsx'
+import { supabase } from '../supabaseClient'
 
 function AuthPage({ onAuthSuccess, onBack }) {
-  const [mode, setMode] = useState('login') // 'login' | 'signup'
-  const { signIn, signUp, signInWithGoogle } = useAuth()
+  const [mode, setMode] = useState('login') // 'login' | 'signup' | 'forgot_password'
+  const { signIn, signUp, signInWithGoogle, resetPasswordForEmail } = useAuth()
   const [form, setForm] = useState({
     loginEmail: '',
     loginPassword: '',
@@ -13,6 +14,7 @@ function AuthPage({ onAuthSuccess, onBack }) {
     signupEmail: '',
     signupPassword: '',
     signupConfirm: '',
+    forgotEmail: '',
   })
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState('')
@@ -83,6 +85,31 @@ function AuthPage({ onAuthSuccess, onBack }) {
     }
   }
 
+  const handleForgotSubmit = async (event) => {
+    event.preventDefault()
+    setError('')
+    setSubmitting(true)
+    
+    try {
+      // Note: Supabase prevents querying auth providers by email client-side to prevent email enumeration.
+      // To make this work, you must create a Postgres RPC function in Supabase named 'get_user_providers' 
+      // that queries auth.identities and returns an array of providers for the given email.
+      const { data: providers } = await supabase.rpc('get_user_providers', { target_email: form.forgotEmail })
+      
+      if (providers && providers.length === 1 && providers.includes('google')) {
+        setError("This email is linked to a Google account. Please use 'Continue with Google' to sign in instead.")
+        setSubmitting(false)
+        return
+      }
+
+      await resetPasswordForEmail(form.forgotEmail)
+      setError('Password reset link sent! Check your inbox.')
+    } catch (err) {
+      setError(err.message || 'Failed to send reset link. Please try again.')
+    } finally {
+      setSubmitting(false)
+    }
+  }
   return (
     <main className="auth-page">
       <div className="auth-card">
@@ -97,10 +124,53 @@ function AuthPage({ onAuthSuccess, onBack }) {
               <path d="M15 18L9 12L15 6" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
             </svg>
           </button>
-          <h1 className="auth-card-title">Welcome</h1>
+          <h1 className="auth-card-title">
+            {mode === 'login' ? 'Welcome' : mode === 'signup' ? 'Create Account' : 'Reset Password'}
+          </h1>
         </header>
 
-        <div className="auth-toggle-row">
+        {mode === 'forgot_password' ? (
+          <form className="auth-form" onSubmit={handleForgotSubmit} style={{ marginTop: '20px' }}>
+            <p style={{ color: 'var(--color-text-secondary)', fontSize: '14px', marginBottom: '24px', textAlign: 'center', lineHeight: '1.5' }}>
+              Enter your email address and we'll send you a link to reset your password.
+            </p>
+            {error && (
+              <p className={error.includes('sent') ? "auth-error-form" : "auth-error-form"} style={error.includes('sent') ? {color: '#4CAF82', backgroundColor: 'rgba(76, 175, 130, 0.1)', borderColor: 'rgba(76, 175, 130, 0.2)'} : {}} role="alert">
+                {error}
+              </p>
+            )}
+            
+            <label className="auth-label" htmlFor="forgotEmail">Email</label>
+            <input
+              id="forgotEmail"
+              type="email"
+              className="auth-input"
+              value={form.forgotEmail}
+              onChange={handleChange('forgotEmail')}
+              placeholder="you@example.com"
+              required
+            />
+            
+            <CustomButton type="submit" variant="primary" fullWidth className="auth-submit" disabled={submitting}>
+              {submitting ? 'Sending...' : 'Send Reset Link'}
+            </CustomButton>
+            
+            <div style={{ textAlign: 'center', marginTop: '16px' }}>
+              <button
+                type="button"
+                className="auth-switch-link"
+                onClick={() => {
+                  setMode('login')
+                  setError('')
+                }}
+              >
+                Back to Login
+              </button>
+            </div>
+          </form>
+        ) : (
+          <>
+            <div className="auth-toggle-row">
           <button
             type="button"
             className={`auth-toggle-tab ${mode === 'login' ? 'auth-toggle-tab-active' : ''}`}
@@ -162,8 +232,17 @@ function AuthPage({ onAuthSuccess, onBack }) {
                     )}
                   </button>
                 </div>
-                <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '-6px' }}>
-                  <button type="button" style={{ background: 'none', border: 'none', padding: 0, fontSize: '0.8rem', color: 'var(--color-text-secondary)', cursor: 'pointer' }}>Forgot password?</button>
+                <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '-6px', marginBottom: '8px' }}>
+                  <button 
+                    type="button" 
+                    onClick={() => {
+                      setMode('forgot_password')
+                      setError('')
+                    }}
+                    style={{ background: 'none', border: 'none', padding: 0, fontSize: '0.8rem', color: 'var(--color-text-secondary)', cursor: 'pointer', fontWeight: 500 }}
+                  >
+                    Forgot password?
+                  </button>
                 </div>
                 {error && (
                   <p className="auth-error-form" role="alert">
@@ -308,6 +387,8 @@ function AuthPage({ onAuthSuccess, onBack }) {
             </section>
           </div>
         </div>
+        </>
+        )}
       </div>
       {error && error !== 'Passwords do not match.' && mode === 'signup' && (
         <p className="auth-error">{error}</p>

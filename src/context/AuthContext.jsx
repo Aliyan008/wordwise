@@ -31,6 +31,7 @@ export function AuthProvider({ children }) {
   const [session, setSession] = useState(null)
   const [profile, setProfile] = useState(null)
   const [loading, setLoading] = useState(true)
+  const [recoveryMode, setRecoveryMode] = useState(false)
 
   // Helper: load profile for a given user id, with 3s timeout
   const loadProfile = async (userId) => {
@@ -95,6 +96,11 @@ export function AuthProvider({ children }) {
       data: { subscription },
     } = authService.onAuthStateChange(async (event, newSession) => {
       console.log('[Auth] onAuthStateChange:', event, newSession)
+      
+      if (event === 'PASSWORD_RECOVERY') {
+        setRecoveryMode(true)
+      }
+      
       setSession(newSession)
       const user = newSession?.user
       const userId = user?.id ?? null
@@ -156,6 +162,14 @@ export function AuthProvider({ children }) {
     setProfile(null)
   }
 
+  const resetPasswordForEmail = async (email) => {
+    return await authService.resetPasswordForEmail(email)
+  }
+
+  const updateUserPassword = async (password) => {
+    return await authService.updateUserPassword(password)
+  }
+
   const saveMissingUsername = async (username) => {
     if (!session?.user?.id) throw new Error("No authenticated user")
     await authService.createProfile(session.user.id, username)
@@ -167,10 +181,14 @@ export function AuthProvider({ children }) {
     user: session?.user ?? null,
     profile,
     loading,
+    recoveryMode,
+    setRecoveryMode,
     signUp,
     signIn,
     signInWithGoogle,
     signOut,
+    resetPasswordForEmail,
+    updateUserPassword,
     saveMissingUsername,
   }
 
