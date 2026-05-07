@@ -116,6 +116,64 @@
 .game-tile {
   width: 52px;
   height: 52px;
+  perspective: 1000px; /* 3D perspective for flip */
+}
+
+.game-tile-inner {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  transform-style: preserve-3d;
+}
+
+/* When the tile is revealed, flip it */
+.game-tile.revealed .game-tile-inner {
+  transform: rotateX(180deg);
+}
+
+.game-tile-front,
+.game-tile-back {
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+  backface-visibility: hidden;
+  /* Default empty style for the front face */
+  background-color: var(--color-surface);
+  border-color: var(--color-border-light);
+  color: var(--color-text-primary);
+}
+
+.game-tile-back {
+  transform: rotateX(180deg);
+}
+
+/* Status colors applied to the inner container to style the back face */
+.game-tile-inner.status-correct .game-tile-back {
+  background-color: var(--color-success);
+  border-color: var(--color-success);
+  color: #ffffff;
+}
+
+.game-tile-inner.status-present .game-tile-back {
+  background-color: var(--color-warning);
+  border-color: var(--color-warning);
+  color: var(--color-text-primary);
+}
+
+.game-tile-inner.status-absent .game-tile-back {
+  background-color: var(--color-border-dark);
+  border-color: var(--color-border-dark);
+  color: var(--color-text-secondary-dark);
+}
+
+/* In case of empty, we just maintain the default colors (though it shouldn't flip if empty) */
+.game-tile-inner.status-empty .game-tile-back {
+  background-color: var(--color-surface);
+  border-color: var(--color-border-light);
+  color: var(--color-text-primary);
 }
 
 @media (min-width: 768px) {

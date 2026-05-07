@@ -332,34 +332,7 @@ function GamePage({ onBack }) {
     return { guess, statusRow, isCurrent }
   })
 
-  const getTileStyle = (status) => {
-    if (status === 'correct') {
-      return {
-        backgroundColor: 'var(--color-success)',
-        borderColor: 'var(--color-success)',
-        color: '#ffffff',
-      }
-    }
-    if (status === 'present') {
-      return {
-        backgroundColor: 'var(--color-warning)',
-        borderColor: 'var(--color-warning)',
-        color: 'var(--color-text-primary)',
-      }
-    }
-    if (status === 'absent') {
-      return {
-        backgroundColor: 'var(--color-border-dark)',
-        borderColor: 'var(--color-border-dark)',
-        color: 'var(--color-text-secondary-dark)',
-      }
-    }
-    return {
-      backgroundColor: 'var(--color-surface)',
-      borderColor: 'var(--color-border-light)',
-      color: 'var(--color-text-primary)',
-    }
-  }
+
 
   const getKeyStyle = (state) => {
     if (state === 'correct') {
@@ -431,13 +404,24 @@ function GamePage({ onBack }) {
                       : guess[colIdx] || ''
                   const status = statusRow[colIdx] || 'empty'
 
+                  const isRevealed = status !== 'empty'
+                  
                   return (
                     <div
                       key={colIdx}
-                      className="game-tile border flex items-center justify-center text-lg font-bold rounded-md transition-colors duration-200"
-                      style={getTileStyle(status)}
+                      className={`game-tile ${isRevealed ? 'revealed' : ''}`}
                     >
-                      {letter}
+                      <div 
+                        className={`game-tile-inner status-${status}`}
+                        style={{ transitionDelay: `${colIdx * 150}ms` }}
+                      >
+                        <div className="game-tile-front border flex items-center justify-center text-lg font-bold rounded-md">
+                          {letter}
+                        </div>
+                        <div className="game-tile-back border flex items-center justify-center text-lg font-bold rounded-md">
+                          {letter}
+                        </div>
+                      </div>
                     </div>
                   )
                 })}
