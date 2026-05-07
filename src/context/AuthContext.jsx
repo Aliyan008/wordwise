@@ -176,6 +176,12 @@ export function AuthProvider({ children }) {
     await loadProfile(session.user.id)
   }
 
+  const refreshProfile = async () => {
+    if (session?.user?.id) {
+      await loadProfile(session.user.id)
+    }
+  }
+
   const value = {
     session,
     user: session?.user ?? null,
@@ -190,6 +196,7 @@ export function AuthProvider({ children }) {
     resetPasswordForEmail,
     updateUserPassword,
     saveMissingUsername,
+    refreshProfile,
   }
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>

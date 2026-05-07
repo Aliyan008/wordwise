@@ -80,9 +80,59 @@ export const authService = {
   getProfile: async (userId) => {
     const { data, error } = await supabase
       .from('profiles')
-      .select('id, username')
+      .select('id, username, avatar_url')
       .eq('id', userId)
       .single()
+    return { data, error }
+  },
+
+  updateProfile: async (userId, updates) => {
+    const { data, error } = await supabase
+      .from('profiles')
+      .update(updates)
+      .eq('id', userId)
+      .select()
+      .single()
+    if (error) throw error
+    return data
+  },
+
+  // Storage Methods
+  uploadAvatar: async (userId, file) => {
+    // Accept either File or Blob (cropper returns a Blob).
+    // Derive extension from File.name when present, otherwise from MIME type.
+    let fileExt = 'jpg'
+    if (file && typeof file.name === 'string' && file.name.includes('.')) {
+      fileExt = file.name.split('.').pop()
+    } else if (file && typeof file.type === 'string' && file.type.startsWith('image/')) {
+      fileExt = file.type.split('/')[1] || 'jpg'
+      if (fileExt === 'jpeg') fileExt = 'jpg'
+    }
+    const contentType = (file && file.type) || `image/${fileExt === 'jpg' ? 'jpeg' : fileExt}`
+    const fileName = `${userId}/avatar-${Date.now()}.${fileExt}`
+
+    const { error: uploadError } = await supabase.storage
+      .from('avatars')
+      .upload(fileName, file, { upsert: true, contentType })
+
+    if (uploadError) throw uploadError
+
+    const { data: { publicUrl } } = supabase.storage
+      .from('avatars')
+      .getPublicUrl(fileName)
+
+    return publicUrl
+  },
+
+  // Batch fetch username + avatar_url for many users (used by leaderboard)
+  getProfilesByIds: async (userIds) => {
+    if (!Array.isArray(userIds) || userIds.length === 0) {
+      return { data: [], error: null }
+    }
+    const { data, error } = await supabase
+      .from('profiles')
+      .select('id, username, avatar_url')
+      .in('id', userIds)
     return { data, error }
   }
 }

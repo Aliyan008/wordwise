@@ -1,23 +1,39 @@
 import './LandingPage.css'
 import CustomButton from '../components/CustomButton'
+import CustomDialog from '../components/CustomDialog'
 import { useAuth } from '../context/AuthContext.jsx'
 import { useState } from 'react'
 
 function LandingPage({ onNavigate }) {
   const { profile, signOut } = useAuth() || {}
   const [isMenuOpen, setIsMenuOpen] = useState(false)
+  const [isLogoutConfirmOpen, setIsLogoutConfirmOpen] = useState(false)
+  const [isLoggingOut, setIsLoggingOut] = useState(false)
 
   const usernameLetter = profile?.username?.[0]?.toUpperCase() || '?'
+  const avatarUrl = profile?.avatar_url || null
 
   const handleAvatarClick = () => {
     setIsMenuOpen((open) => !open)
   }
 
-  const handleLogout = async () => {
+  const handleLogoutClick = () => {
     setIsMenuOpen(false)
+    setIsLogoutConfirmOpen(true)
+  }
+
+  const handleCancelLogout = () => {
+    if (isLoggingOut) return
+    setIsLogoutConfirmOpen(false)
+  }
+
+  const handleConfirmLogout = async () => {
+    setIsLoggingOut(true)
     try {
       await signOut?.()
     } finally {
+      setIsLoggingOut(false)
+      setIsLogoutConfirmOpen(false)
       onNavigate?.('landing')
     }
   }
@@ -42,7 +58,11 @@ function LandingPage({ onNavigate }) {
               onClick={handleAvatarClick}
               aria-label="User menu"
             >
-              <span>{usernameLetter}</span>
+              {avatarUrl ? (
+                <img src={avatarUrl} alt="Profile" className="landing-avatar-image" />
+              ) : (
+                <span>{usernameLetter}</span>
+              )}
             </button>
             {isMenuOpen && (
               <div className="landing-avatar-menu">
@@ -59,7 +79,7 @@ function LandingPage({ onNavigate }) {
                 <button
                   type="button"
                   className="landing-avatar-menu-item landing-avatar-menu-item-danger"
-                  onClick={handleLogout}
+                  onClick={handleLogoutClick}
                 >
                   Log Out
                 </button>
@@ -125,6 +145,29 @@ function LandingPage({ onNavigate }) {
           <p className="landing-footer-text">Made for kids who love words.</p>
         </section>
       </section>
+
+      <CustomDialog isOpen={isLogoutConfirmOpen} title="Log out?">
+        <p className="landing-logout-desc">
+          You'll need to sign in again to access your profile and stats.
+        </p>
+        <div className="landing-logout-actions">
+          <CustomButton
+            variant="secondary"
+            onClick={handleCancelLogout}
+            disabled={isLoggingOut}
+          >
+            Cancel
+          </CustomButton>
+          <button
+            type="button"
+            className="landing-logout-confirm-btn"
+            onClick={handleConfirmLogout}
+            disabled={isLoggingOut}
+          >
+            {isLoggingOut ? 'Logging out…' : 'Log Out'}
+          </button>
+        </div>
+      </CustomDialog>
     </main>
   )
 }

@@ -1,8 +1,10 @@
 import { useEffect, useState } from 'react'
 import { supabase } from '../supabaseClient'
+import { authService } from '../services/authService'
 import './LeaderboardPage.css'
 
 const LEADERBOARD_CACHE_KEY = 'wordwise_leaderboard_cache'
+const LEADERBOARD_PROFILES_CACHE_KEY = 'wordwise_leaderboard_profiles_cache'
 const CACHE_MAX_AGE_MS = 60 * 60 * 1000 // 1 hour
 const GAMES_SELECT = 'id, user_id, username, difficulty, won, guesses_used, max_guesses, last_updatedat'
 
@@ -41,6 +43,37 @@ function mergeGames(cachedGames, incomingGames) {
     byId.set(g.id, { ...g })
   }
   return Array.from(byId.values())
+}
+
+// One-time cleanup of the previous-format cache key so users don't carry
+// stale avatar-only data after the schema change.
+try {
+  localStorage.removeItem('wordwise_leaderboard_avatars_cache')
+} catch {
+  // ignore
+}
+
+function getProfilesCache() {
+  try {
+    const raw = localStorage.getItem(LEADERBOARD_PROFILES_CACHE_KEY)
+    if (!raw) return null
+    const data = JSON.parse(raw)
+    if (!data || typeof data.profiles !== 'object' || !data.lastFetchTimestamp) return null
+    return data
+  } catch {
+    return null
+  }
+}
+
+function setProfilesCache(profiles, lastFetchTimestamp) {
+  try {
+    localStorage.setItem(
+      LEADERBOARD_PROFILES_CACHE_KEY,
+      JSON.stringify({ profiles, lastFetchTimestamp }),
+    )
+  } catch {
+    // ignore
+  }
 }
 
 function aggregateByPlayer(games, difficultyFilter) {
@@ -83,6 +116,10 @@ function LeaderboardPage({ onBack }) {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
   const [difficultyFilter, setDifficultyFilter] = useState('All')
+  const [profiles, setProfiles] = useState(() => {
+    const cached = getProfilesCache()
+    return cached ? cached.profiles : {}
+  })
 
   useEffect(() => {
     let mounted = true
@@ -137,6 +174,57 @@ function LeaderboardPage({ onBack }) {
         setLoading(false)
       })
   }, [])
+
+  // Fetch latest username + avatar_url from profiles for the unique user_ids
+  // on the leaderboard. Source of truth = profiles, not the denormalized
+  // username stored in games (which can be stale after a username change).
+  // Uses its own cache so we only re-fetch when stale.
+  useEffect(() => {
+    if (games.length === 0) return
+    let mounted = true
+
+    const userIds = Array.from(
+      new Set(games.map((g) => g.user_id).filter(Boolean)),
+    )
+    if (userIds.length === 0) return
+
+    const cached = getProfilesCache()
+    const ageMs = cached
+      ? Date.now() - new Date(cached.lastFetchTimestamp).getTime()
+      : Infinity
+    const cachedProfiles = cached ? cached.profiles : {}
+    const missingIds = userIds.filter((id) => !(id in cachedProfiles))
+
+    // Fresh cache and no new users -> skip
+    if (ageMs < CACHE_MAX_AGE_MS && missingIds.length === 0) {
+      if (cached) setProfiles(cachedProfiles)
+      return
+    }
+
+    const idsToFetch =
+      ageMs < CACHE_MAX_AGE_MS ? missingIds : userIds
+
+    authService.getProfilesByIds(idsToFetch).then(({ data, error: err }) => {
+      if (!mounted || err || !data) return
+      const next = { ...cachedProfiles }
+      for (const row of data) {
+        next[row.id] = {
+          username: row.username || null,
+          avatar_url: row.avatar_url || null,
+        }
+      }
+      // Mark fetched users we didn't get a row back for as resolved-null
+      for (const id of idsToFetch) {
+        if (!(id in next)) next[id] = { username: null, avatar_url: null }
+      }
+      setProfiles(next)
+      setProfilesCache(next, new Date().toISOString())
+    })
+
+    return () => {
+      mounted = false
+    }
+  }, [games])
 
   const ranked = aggregateByPlayer(games, difficultyFilter)
 
@@ -202,7 +290,12 @@ function LeaderboardPage({ onBack }) {
         <ul className="leaderboard-list" role="list">
           {ranked.map((row, index) => {
             const isFirst = index === 0;
-            const initial = row.username ? row.username[0].toUpperCase() : '?';
+            // Prefer the live profile (username + avatar) over the stale,
+            // denormalized values stored on each game row.
+            const liveProfile = profiles[row.user_id] || {};
+            const displayName = liveProfile.username || row.username;
+            const avatarUrl = liveProfile.avatar_url || null;
+            const initial = displayName ? displayName[0].toUpperCase() : '?';
 
             return (
               <li
@@ -222,11 +315,19 @@ function LeaderboardPage({ onBack }) {
                 </div>
                 
                 <div className={`leaderboard-avatar ${isFirst ? 'leaderboard-avatar-first' : ''}`}>
-                  <span>{initial}</span>
+                  {avatarUrl ? (
+                    <img
+                      src={avatarUrl}
+                      alt={`${displayName} avatar`}
+                      className="leaderboard-avatar-image"
+                    />
+                  ) : (
+                    <span>{initial}</span>
+                  )}
                 </div>
 
                 <div className="leaderboard-card-body">
-                  <span className="leaderboard-username">{row.username}</span>
+                  <span className="leaderboard-username">{displayName}</span>
                   <div className="leaderboard-stats">
                     <div className="leaderboard-stat-item">
                       <span className="leaderboard-stat-label">Games Played</span>
