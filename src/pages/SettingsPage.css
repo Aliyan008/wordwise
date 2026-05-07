@@ -1,71 +1,52 @@
 .settings {
+  width: 100%;
+  min-height: 100vh;
+  min-height: 100dvh;
   display: flex;
   flex-direction: column;
   align-items: stretch;
   justify-content: flex-start;
-  width: 100%;
-  min-height: 100vh;
-}
-
-.settings-card {
-  width: 100%;
-  max-width: 100%;
-  background-color: transparent;
-  border-radius: 0;
-  box-shadow: none;
-  padding: 24px 16px;
-  display: flex;
-  flex-direction: column;
-  gap: 24px;
+  padding: 16px;
+  box-sizing: border-box;
+  background-color: var(--color-background);
 }
 
 .settings-header {
-  position: relative;
-  text-align: center;
   display: flex;
   align-items: center;
-  justify-content: center;
+  gap: 16px;
+  margin-bottom: 24px;
 }
 
 .settings-back-button {
-  position: absolute;
-  left: 0;
-  top: 50%;
-  transform: translateY(-50%);
-  background: none;
-  border: none;
-  cursor: pointer;
-  padding: 8px;
+  background: transparent;
+  border: 1px solid var(--color-border-light);
   border-radius: 8px;
-  color: var(--color-text-primary);
+  cursor: pointer;
+  padding: 8px 12px;
+  color: var(--color-text-secondary);
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: background-color 150ms ease-out, transform 150ms ease-out;
+  transition: all 150ms ease-out;
 }
 
 .settings-back-button:hover {
   background-color: var(--color-border-light);
-  transform: translateY(-50%) translateX(-2px);
-}
-
-.settings-back-button:active {
-  transform: translateY(-50%) scale(0.95);
-}
-
-.settings-back-button svg {
-  width: 24px;
-  height: 24px;
+  color: var(--color-text-primary);
 }
 
 .settings-title {
   margin: 0;
-  font-size: 2rem;
-  font-weight: 800;
+  font-size: 1.5rem;
+  font-weight: 700;
   color: var(--color-text-primary);
 }
 
-.settings-content {
+.settings-card {
+  max-width: 600px;
+  width: 100%;
+  margin: 0 auto;
   display: flex;
   flex-direction: column;
   gap: 32px;
@@ -74,146 +55,83 @@
 .settings-section {
   display: flex;
   flex-direction: column;
-  gap: 20px;
+}
+
+.settings-section-card {
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border-light);
+  border-radius: 16px;
+  overflow: hidden;
+}
+
+.settings-card-header {
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--color-border-light);
 }
 
 .settings-section-title {
   margin: 0;
-  font-size: 1.1rem;
+  font-size: 0.75rem;
   font-weight: 700;
-  color: var(--color-text-primary);
-  border-bottom: 2px solid var(--color-border-light);
-  padding-bottom: 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--color-text-secondary);
 }
 
 .settings-item {
   display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px;
+}
+
+.settings-item:not(:last-child) {
+  border-bottom: 1px solid var(--color-border-light);
+}
+
+.settings-item-stacked {
   flex-direction: column;
-  gap: 8px;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.settings-item-stacked .settings-control {
+  width: 100%;
 }
 
 .settings-label {
   font-size: 0.95rem;
   font-weight: 600;
   color: var(--color-text-primary);
+  margin: 0;
 }
 
 .settings-control {
-  width: 100%;
-}
-
-
-.settings-toggle-label {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  cursor: pointer;
-  font-size: 0.95rem;
-  font-weight: 600;
-  color: var(--color-text-primary);
-  gap: 12px;
+  justify-content: flex-end;
 }
 
-.settings-toggle-wrapper {
-  position: relative;
-  flex-shrink: 0;
-  display: flex;
-  align-items: center;
-}
-
-.settings-toggle {
-  position: absolute;
-  width: 0;
-  height: 0;
-  opacity: 0;
-  pointer-events: none;
-}
-
-.settings-toggle-slider {
-  position: relative;
-  width: 68px;
-  height: 36px;
-  background-color: var(--color-border-light);
-  border-radius: 36px;
-  transition: background-color 300ms cubic-bezier(0.4, 0, 0.2, 1), border-color 300ms cubic-bezier(0.4, 0, 0.2, 1);
-  display: flex;
-  align-items: center;
-  padding: 4px;
-  box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.12), 0 2px 4px rgba(0, 0, 0, 0.08);
-  border: 2px solid var(--color-border-light);
-  cursor: pointer;
-}
-
-.settings-toggle-slider::before {
-  content: '';
-  position: absolute;
-  width: 28px;
-  height: 28px;
-  left: 4px;
-  top: 50%;
-  transform: translateY(-50%);
-  background: linear-gradient(135deg, #ffffff 0%, #f5f5f5 100%);
-  border-radius: 50%;
-  transition: transform 300ms cubic-bezier(0.4, 0, 0.2, 1), box-shadow 300ms cubic-bezier(0.4, 0, 0.2, 1);
-  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2), 0 1px 3px rgba(0, 0, 0, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.8);
-  z-index: 3;
-}
-
-.settings-toggle:checked + .settings-toggle-slider {
-  background-color: var(--color-primary);
-  border-color: var(--color-primary);
-  box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.15), 0 4px 12px rgba(249, 115, 22, 0.3);
-}
-
-.settings-toggle:checked + .settings-toggle-slider::before {
-  transform: translateY(-50%) translateX(36px);
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.25), 0 2px 4px rgba(0, 0, 0, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.9);
-  background: linear-gradient(135deg, #ffffff 0%, #f8f8f8 100%);
-}
-
-.settings-toggle-slider:hover {
-  box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.15), 0 3px 6px rgba(0, 0, 0, 0.12);
-}
-
-.settings-toggle:checked + .settings-toggle-slider:hover {
-  box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.2), 0 6px 16px rgba(249, 115, 22, 0.4);
-}
-
-/* Tablet - 600px and up */
 @media (min-width: 600px) {
-  .settings-card {
-    padding: 32px 24px;
-    gap: 28px;
-  }
-
-  .settings-title {
-    font-size: 2.25rem;
-  }
-}
-
-/* Desktop - 768px and up */
-@media (min-width: 768px) {
   .settings {
-    align-items: center;
-    justify-content: center;
-  }
-
-  .settings-card {
-    padding: 40px 32px;
-    gap: 32px;
-    max-width: 640px;
-    margin: 0 auto;
-  }
-
-  .settings-title {
-    font-size: 2.5rem;
+    padding: 32px;
   }
 }
 
-/* Large Desktop - 1024px and up */
-@media (min-width: 1024px) {
-  .settings-card {
-    padding: 48px 40px;
-    gap: 36px;
-  }
+.settings-lives-message {
+  margin-top: -4px; /* Pull it slightly closer to the lives selector */
+  font-size: 0.8rem;
+  font-style: italic;
+  font-weight: 700;
+  color: var(--color-text-secondary);
+  align-self: flex-end;
+  text-align: right;
+}
+
+.settings-lives-cheat {
+  color: #FF6B1A; /* Match primary orange */
+}
+
+.settings-lives-brave {
+  color: #4CAF82; /* Match secondary green */
 }

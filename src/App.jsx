@@ -6,6 +6,7 @@ import AuthPage from './pages/AuthPage.jsx'
 import SettingsPage from './pages/SettingsPage.jsx'
 import GamePage from './pages/GamePage.jsx'
 import LeaderboardPage from './pages/LeaderboardPage.jsx'
+import FAQPage from './pages/FAQPage.jsx'
 
 const VALID_ROUTES = ['landing', 'auth', 'settings', 'game', 'leaderboard', 'faq']
 const ROUTE_STORAGE_KEY = 'wordwise_route'
@@ -61,14 +62,7 @@ function App() {
       case 'leaderboard':
         return <LeaderboardPage onBack={() => navigateTo('landing')} />
       case 'faq':
-        // FAQ page will be created later
-        return (
-          <div style={{ padding: '2rem', textAlign: 'center' }}>
-            <h1>FAQ</h1>
-            <p>Coming soon...</p>
-            <button onClick={() => navigateTo('landing')}>Back to Home</button>
-          </div>
-        )
+        return <FAQPage onBack={() => navigateTo('landing')} />
       default:
         return <LandingPage onNavigate={navigateTo} />
     }

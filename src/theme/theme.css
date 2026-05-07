@@ -4,10 +4,10 @@
     sans-serif;
 
   /* Light theme palette */
-  --color-primary: #f97316; /* orange */
+  --color-primary: #FF6B1A; /* orange */
   --color-primary-hover: #ea580c;
-  --color-secondary: #06b6d4;
-  --color-background: #f8fafc;
+  --color-secondary: #4CAF82;
+  --color-background: #F5F5F5;
   --color-surface: #ffffff;
   --color-text-primary: #0f172a;
   --color-text-secondary: #475569;
@@ -18,10 +18,20 @@
   --color-border-dark: #1f2937;
 
   /* Shadows */
-  --shadow-soft: 0 18px 40px rgba(15, 23, 42, 0.08);
-  --shadow-logo: 0 12px 24px rgba(249, 115, 22, 0.35);
-  --shadow-button: 0 14px 30px rgba(249, 115, 22, 0.35);
-  --shadow-button-hover: 0 18px 38px rgba(249, 115, 22, 0.4);
+  --shadow-soft: none;
+  --shadow-logo: none;
+  --shadow-button: none;
+  --shadow-button-hover: none;
+
+  /* Custom App Values */
+  --color-tile-absent: #1E2235;
+  --color-tile-correct: #4CAF82;
+  --color-tile-present: #F5A623;
+  --color-tile-empty-border: #CCCCCC;
+  --color-primary-light: #FFF0E8;
+  --border-radius-tile: 10px;
+  --border-radius-card: 16px;
+  --border-radius-pill: 20px;
 
   /* Dark theme palette (reserved for future toggle) */
   --color-background-dark: #1a1a1a;

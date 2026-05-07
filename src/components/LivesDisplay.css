@@ -45,9 +45,8 @@
 }
 
 .heart-empty {
-  opacity: 0.3;
+  opacity: 1;
   transform: scale(0.9);
-  filter: grayscale(100%);
 }
 
 .lives-count {

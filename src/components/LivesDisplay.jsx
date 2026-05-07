@@ -8,29 +8,15 @@ function LivesDisplay({ lives, maxLives }) {
   return (
     <div className="lives-display">
       <span className="lives-label">Lives:</span>
-      <div className={`lives-hearts ${isTwoRows ? 'lives-hearts-two-rows' : ''}`}>
-        <div className="lives-hearts-row">
-          {Array.from({ length: firstRowCount }).map((_, index) => (
-            <span
-              key={index}
-              className={`heart ${index < lives ? 'heart-full' : 'heart-empty'}`}
-            >
-              ❤️
-            </span>
-          ))}
-        </div>
-        {isTwoRows && (
-          <div className="lives-hearts-row">
-            {Array.from({ length: secondRowCount }).map((_, index) => (
-              <span
-                key={firstRowCount + index}
-                className={`heart ${firstRowCount + index < lives ? 'heart-full' : 'heart-empty'}`}
-              >
-                ❤️
-              </span>
-            ))}
-          </div>
-        )}
+      <div className="lives-hearts">
+        {Array.from({ length: maxLives }).map((_, index) => (
+          <span
+            key={index}
+            className={`heart ${index < lives ? 'heart-full' : 'heart-empty'}`}
+          >
+            {index < lives ? '❤️' : '🤍'}
+          </span>
+        ))}
       </div>
       <span className="lives-count">{lives}/{maxLives}</span>
     </div>

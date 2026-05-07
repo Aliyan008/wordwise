@@ -179,20 +179,26 @@ function GamePage({ onBack }) {
     setDifficulty(savedDifficulty)
 
     let pool = ALL_WORDS
-    let allowedGuesses = 6
+    
+    const getDefaultLives = (diff) => {
+      if (diff === "you ain't that tuff 🥀") return 4
+      if (diff === 'Hard') return 5
+      return 6
+    }
+    
+    let savedLives = parseInt(localStorage.getItem('lives'), 10)
+    let allowedGuesses = (!isNaN(savedLives) && savedLives >= 3 && savedLives <= 6) 
+      ? savedLives 
+      : getDefaultLives(savedDifficulty)
 
     if (savedDifficulty === 'Easy') {
       pool = EASY_WORDS
-      allowedGuesses = 6
     } else if (savedDifficulty === 'Normal') {
       pool = ALL_WORDS
-      allowedGuesses = 6
     } else if (savedDifficulty === 'Hard') {
       pool = ALL_WORDS
-      allowedGuesses = 5
     } else if (savedDifficulty === "you ain't that tuff 🥀") {
       pool = TOUGH_WORDS
-      allowedGuesses = 5
     }
 
     setMaxGuesses(allowedGuesses)
@@ -334,30 +340,7 @@ function GamePage({ onBack }) {
 
 
 
-  const getKeyStyle = (state) => {
-    if (state === 'correct') {
-      return {
-        backgroundColor: 'var(--color-success)',
-        color: '#ffffff',
-      }
-    }
-    if (state === 'present') {
-      return {
-        backgroundColor: 'var(--color-warning)',
-        color: 'var(--color-text-primary)',
-      }
-    }
-    if (state === 'absent') {
-      return {
-        backgroundColor: 'var(--color-border-dark)',
-        color: 'var(--color-text-secondary-dark)',
-      }
-    }
-    return {
-      backgroundColor: 'var(--color-surface)',
-      color: 'var(--color-text-primary)',
-    }
-  }
+  // Removed getKeyStyle inline object styling
 
   const livesRemaining =
     gameStatus === 'playing' ? Math.max(maxGuesses - guesses.length, 0) : 0
@@ -366,31 +349,31 @@ function GamePage({ onBack }) {
     <main className="game-page">
       <div className="game-container">
         <div className="game-inner">
-          <header className="flex items-center justify-between mb-2">
+          <header className="game-header" style={{ flexDirection: 'column', alignItems: 'center' }}>
             <button
               onClick={onBack}
               aria-label="Back to home"
-              className="text-sm text-[color:var(--color-text-secondary)] hover:text-[color:var(--color-text-primary)]"
+              className="game-back-button"
             >
-              ← Back
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M15 18l-6-6 6-6" />
+              </svg>
             </button>
-            <div className="flex flex-col items-center gap-1">
-              <h1 className="text-xl font-bold tracking-wide">
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px' }}>
+              <h1 style={{ margin: 0, fontSize: '1.25rem', fontWeight: 800, color: 'var(--color-text-primary)', letterSpacing: '0.02em' }}>
                 WordWise • Daily
               </h1>
-              <p className="text-[11px] uppercase tracking-wide text-[color:var(--color-text-secondary)]">
+              <p style={{ margin: 0, fontSize: '0.75rem', textTransform: 'uppercase', color: 'var(--color-text-secondary)', fontWeight: 600, letterSpacing: '0.05em' }}>
                 {difficulty} • {maxGuesses} guesses
               </p>
             </div>
-            <button
-              onClick={resetGame}
-              className="text-xs text-[color:var(--color-primary)] hover:text-[color:var(--color-primary-hover)]"
-            >
+            {/* TODO: Implement logic to only show this badge if the user hasn't played today's word yet */}
+            <span style={{ position: 'absolute', right: 0, top: '50%', transform: 'translateY(-50%)', backgroundColor: '#FF6B1A', color: '#fff', fontSize: '0.7rem', fontWeight: 700, padding: '4px 10px', borderRadius: '999px', textTransform: 'uppercase' }}>
               New
-            </button>
+            </span>
           </header>
 
-          <div className="flex justify-end mb-1">
+          <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '8px' }}>
             <LivesDisplay lives={livesRemaining} maxLives={maxGuesses} />
           </div>
 
@@ -429,18 +412,17 @@ function GamePage({ onBack }) {
             ))}
           </section>
 
-          <section className="mt-4 flex flex-col items-center gap-1 w-full px-1 sm:w-auto sm:px-0">
+          <section className="mt-4 flex flex-col items-center gap-2 w-full px-1 sm:w-auto sm:px-0">
             {message && (
-              <p className="mb-1 text-xs font-semibold text-[color:var(--color-error)]">
+              <p className="mb-2 text-xs font-semibold text-[color:var(--color-error)]">
                 {message}
               </p>
             )}
             {KEYBOARD_ROWS.map((row) => (
-              <div key={row} className="flex justify-center w-full sm:w-auto gap-1">
+              <div key={row} className="flex justify-center w-full sm:w-auto gap-2">
                 {row === 'ZXCVBNM' && (
                   <button
-                    className="flex-[1.5] sm:flex-none sm:px-3 py-3 sm:py-2 rounded-md text-xs sm:text-sm font-semibold border border-[color:var(--color-border-light)] flex justify-center items-center"
-                    style={getKeyStyle('idle')}
+                    className="game-key game-key-enter"
                     onClick={() => handleKey('ENTER')}
                   >
                     Enter
@@ -448,11 +430,11 @@ function GamePage({ onBack }) {
                 )}
                 {row.split('').map((letter) => {
                   const state = keyboardState[letter] || 'idle'
+                  const stateClass = state !== 'idle' ? `game-key-${state}` : ''
                   return (
                     <button
                       key={letter}
-                      className="flex-1 sm:flex-none sm:px-3 py-3 sm:py-2 rounded-md text-[13px] sm:text-sm font-semibold cursor-pointer select-none transition-colors duration-150 border border-[color:var(--color-border-light)] flex justify-center items-center"
-                      style={getKeyStyle(state)}
+                      className={`game-key ${stateClass}`}
                       onClick={() => handleKey(letter)}
                     >
                       {letter}
@@ -461,9 +443,9 @@ function GamePage({ onBack }) {
                 })}
                 {row === 'ZXCVBNM' && (
                   <button
-                    className="flex-[1.5] sm:flex-none sm:px-3 py-3 sm:py-2 rounded-md text-xs sm:text-sm font-semibold border border-[color:var(--color-border-light)] flex justify-center items-center"
-                    style={getKeyStyle('idle')}
+                    className="game-key game-key-delete"
                     onClick={() => handleKey('BACKSPACE')}
+                    aria-label="Delete"
                   >
                     <svg xmlns="http://www.w3.org/2000/svg" height="20" viewBox="0 0 24 24" width="20" fill="currentColor">
                       <path d="M22 3H7c-.69 0-1.23.35-1.59.88L0 12l5.41 8.11c.36.53.9.89 1.59.89h15c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H7.07L2.4 12l4.66-7H22v14zm-11.59-2L14 13.41 17.59 17 19 15.59 15.41 12 19 8.41 17.59 7 14 10.59 10.41 7 9 8.41 12.59 12 9 15.59z"></path>

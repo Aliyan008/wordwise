@@ -200,45 +200,57 @@ function LeaderboardPage({ onBack }) {
         <p className="leaderboard-empty">No games yet. Play to appear here!</p>
       ) : (
         <ul className="leaderboard-list" role="list">
-          {ranked.map((row, index) => (
-            <li
-              key={row.user_id}
-              className={`leaderboard-card ${index < 3 ? 'leaderboard-card-podium' : ''}`}
-            >
-              <span className={getRankClass(index)}>
-                {index < 3 ? (
-                  <span className="leaderboard-medal" aria-hidden>
-                    {index === 0 ? '🥇' : index === 1 ? '🥈' : '🥉'}
+          {ranked.map((row, index) => {
+            const isFirst = index === 0;
+            const initial = row.username ? row.username[0].toUpperCase() : '?';
+
+            return (
+              <li
+                key={row.user_id}
+                className={`leaderboard-card ${isFirst ? 'leaderboard-card-first' : ''}`}
+              >
+                <div className="leaderboard-rank-container">
+                  <span className={getRankClass(index)}>
+                    {index < 3 ? (
+                      <span className="leaderboard-medal" aria-hidden>
+                        {index === 0 ? '🥇' : index === 1 ? '🥈' : '🥉'}
+                      </span>
+                    ) : (
+                      index + 1
+                    )}
                   </span>
-                ) : (
-                  index + 1
-                )}
-              </span>
-              <div className="leaderboard-card-body">
-                <span className="leaderboard-username">{row.username}</span>
-                <div className="leaderboard-stats">
-                  <div className="leaderboard-stat-item">
-                    <span className="leaderboard-stat-label">Games Played</span>
-                    <span className="leaderboard-stat-value">{row.totalGames}</span>
-                  </div>
-                  <div className="leaderboard-stat-item">
-                    <span className="leaderboard-stat-label">Wins</span>
-                    <span className="leaderboard-stat-value">{row.wins}</span>
-                  </div>
-                  <div className="leaderboard-stat-item">
-                    <span className="leaderboard-stat-label">Win Rate</span>
-                    <span className="leaderboard-stat-value">{row.winRate.toFixed(0)}%</span>
-                  </div>
-                  <div className="leaderboard-stat-item">
-                    <span className="leaderboard-stat-label">Avg Guesses</span>
-                    <span className="leaderboard-stat-value">
-                      {row.avgGuesses != null ? row.avgGuesses.toFixed(1) : '—'}
-                    </span>
+                </div>
+                
+                <div className={`leaderboard-avatar ${isFirst ? 'leaderboard-avatar-first' : ''}`}>
+                  <span>{initial}</span>
+                </div>
+
+                <div className="leaderboard-card-body">
+                  <span className="leaderboard-username">{row.username}</span>
+                  <div className="leaderboard-stats">
+                    <div className="leaderboard-stat-item">
+                      <span className="leaderboard-stat-label">Games Played</span>
+                      <span className="leaderboard-stat-value">{row.totalGames}</span>
+                    </div>
+                    <div className="leaderboard-stat-item">
+                      <span className="leaderboard-stat-label">Wins</span>
+                      <span className="leaderboard-stat-value">{row.wins}</span>
+                    </div>
+                    <div className="leaderboard-stat-item">
+                      <span className="leaderboard-stat-label">Win Rate</span>
+                      <span className="leaderboard-stat-value">{row.winRate.toFixed(0)}%</span>
+                    </div>
+                    <div className="leaderboard-stat-item">
+                      <span className="leaderboard-stat-label">Avg Guesses</span>
+                      <span className="leaderboard-stat-value">
+                        {row.avgGuesses != null ? row.avgGuesses.toFixed(1) : '—'}
+                      </span>
+                    </div>
                   </div>
                 </div>
-              </div>
-            </li>
-          ))}
+              </li>
+            )
+          })}
         </ul>
       )}
     </main>
