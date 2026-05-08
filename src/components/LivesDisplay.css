@@ -1,42 +1,28 @@
 .lives-display {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 10px;
   padding: 0;
   margin-left: auto;
+  line-height: 1;
 }
 
 .lives-label {
-  font-size: 0.85rem;
-  font-weight: 600;
-  color: var(--color-text-primary);
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--color-text-secondary);
+  line-height: 1;
 }
 
 .lives-hearts {
   display: flex;
-  gap: 4px;
   align-items: center;
-}
-
-.lives-hearts-two-rows {
-  flex-direction: column;
-  gap: 2px;
-}
-
-.lives-hearts-row {
-  display: flex;
-  gap: 4px;
-  align-items: center;
+  gap: 8px;
 }
 
 .heart {
-  font-size: 1.25rem;
+  display: block;
   transition: transform 200ms ease-out, opacity 200ms ease-out;
-  line-height: 1;
-}
-
-.lives-hearts-two-rows .heart {
-  font-size: 1rem;
 }
 
 .heart-full {
@@ -46,33 +32,13 @@
 
 .heart-empty {
   opacity: 1;
-  transform: scale(0.9);
+  transform: scale(0.95);
 }
 
 .lives-count {
-  font-size: 0.8rem;
-  font-weight: 600;
+  font-size: 13px;
+  font-weight: 500;
   color: var(--color-text-secondary);
-}
-
-@media (min-width: 600px) {
-  .lives-display {
-    gap: 10px;
-  }
-
-  .lives-label {
-    font-size: 0.95rem;
-  }
-
-  .heart {
-    font-size: 1.5rem;
-  }
-
-  .lives-hearts-two-rows .heart {
-    font-size: 1.25rem;
-  }
-
-  .lives-count {
-    font-size: 0.9rem;
-  }
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
 }

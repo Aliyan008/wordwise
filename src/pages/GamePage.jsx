@@ -342,8 +342,7 @@ function GamePage({ onBack }) {
 
   // Removed getKeyStyle inline object styling
 
-  const livesRemaining =
-    gameStatus === 'playing' ? Math.max(maxGuesses - guesses.length, 0) : 0
+  const livesRemaining = Math.max(maxGuesses - guesses.length, 0)
 
   return (
     <main className="game-page">

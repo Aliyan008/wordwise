@@ -5,6 +5,7 @@
   width: 100%;
   min-height: 100vh;
   padding: 16px 16px;
+  background-color: var(--color-background);
 }
 
 .game-container {
@@ -146,13 +147,13 @@
   font-size: 1.5rem;
   font-weight: 700;
   text-transform: uppercase;
-  background-color: #F2F2F2;
-  border: 2px solid #CCCCCC;
+  background-color: var(--color-surface);
+  border: 2px solid var(--color-tile-empty-border);
   color: transparent; /* Empty state has no visible text */
 }
 
 .game-tile-front {
-  color: #1a1a1a; /* If user types before entering, text is dark */
+  color: var(--color-text-primary); /* If user types before entering, text is visible in both themes */
 }
 
 .game-tile-back {
@@ -179,8 +180,8 @@
 }
 
 .game-tile-inner.status-empty .game-tile-back {
-  background-color: #F2F2F2;
-  border-color: #CCCCCC;
+  background-color: var(--color-surface);
+  border-color: var(--color-tile-empty-border);
   color: transparent;
 }
 
@@ -191,14 +192,14 @@
   font-size: 14px;
   font-weight: 600;
   cursor: pointer;
-  border: none;
+  border: 1px solid var(--color-border-light);
   display: flex;
   justify-content: center;
   align-items: center;
   user-select: none;
   transition: opacity 150ms ease;
-  background-color: #EEEEEE;
-  color: #1a1a1a;
+  background-color: var(--color-surface);
+  color: var(--color-text-primary);
   text-transform: uppercase;
 }
 
