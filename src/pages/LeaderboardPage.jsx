@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { supabase } from '../supabaseClient'
 import { authService } from '../services/authService'
+import CustomDropdown from '../components/CustomDropdown'
 import './LeaderboardPage.css'
 
 const LEADERBOARD_CACHE_KEY = 'wordwise_leaderboard_cache'
@@ -9,6 +10,10 @@ const CACHE_MAX_AGE_MS = 60 * 60 * 1000 // 1 hour
 const GAMES_SELECT = 'id, user_id, username, difficulty, won, guesses_used, max_guesses, last_updatedat'
 
 const DIFFICULTY_OPTIONS = ['All', 'Easy', 'Normal', 'Hard', "you ain't that tuff 🥀"]
+const RANK_BY_OPTIONS = [
+  { id: 'wins', label: 'Wins' },
+  { id: 'winRate', label: 'Win %' },
+]
 
 function getCache() {
   try {
@@ -76,7 +81,11 @@ function setProfilesCache(profiles, lastFetchTimestamp) {
   }
 }
 
-function aggregateByPlayer(games, difficultyFilter) {
+// Minimum total games required to be ranked when sorting by win rate.
+// Prevents a 1-of-1 player (100%) from beating a player with many games.
+const MIN_GAMES_FOR_WIN_RATE = 5
+
+function aggregateByPlayer(games, difficultyFilter, rankBy) {
   const filtered =
     difficultyFilter === 'All'
       ? games
@@ -102,13 +111,42 @@ function aggregateByPlayer(games, difficultyFilter) {
     }
   }
 
+  // Tie-breakers (same in both modes for stable, meaningful order):
+  //   primary: chosen metric (rankBy)
+  //   secondary: the other metric
+  //   tertiary: avgGuesses ascending (lower is better; null = worst)
+  //   quaternary: totalGames descending (more games = stronger sample)
+  const compareAvg = (a, b) => {
+    const av = a.avgGuesses == null ? Infinity : a.avgGuesses
+    const bv = b.avgGuesses == null ? Infinity : b.avgGuesses
+    return av - bv
+  }
+
   return Object.values(byUserId)
     .map((p) => ({
       ...p,
       winRate: p.totalGames > 0 ? (p.wins / p.totalGames) * 100 : 0,
       avgGuesses: p.wins > 0 ? p.guessesSum / p.wins : null,
     }))
-    .sort((a, b) => b.wins - a.wins)
+    .filter((p) => {
+      if (p.wins < 1) return false
+      if (rankBy === 'winRate' && p.totalGames < MIN_GAMES_FOR_WIN_RATE) return false
+      return true
+    })
+    .sort((a, b) => {
+      if (rankBy === 'winRate') {
+        if (b.winRate !== a.winRate) return b.winRate - a.winRate
+        if (b.wins !== a.wins) return b.wins - a.wins
+        const avgCmp = compareAvg(a, b)
+        if (avgCmp !== 0) return avgCmp
+        return b.totalGames - a.totalGames
+      }
+      if (b.wins !== a.wins) return b.wins - a.wins
+      if (b.winRate !== a.winRate) return b.winRate - a.winRate
+      const avgCmp = compareAvg(a, b)
+      if (avgCmp !== 0) return avgCmp
+      return b.totalGames - a.totalGames
+    })
 }
 
 function LeaderboardPage({ onBack }) {
@@ -116,6 +154,7 @@ function LeaderboardPage({ onBack }) {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
   const [difficultyFilter, setDifficultyFilter] = useState('All')
+  const [rankBy, setRankBy] = useState('wins')
   const [profiles, setProfiles] = useState(() => {
     const cached = getProfilesCache()
     return cached ? cached.profiles : {}
@@ -226,7 +265,7 @@ function LeaderboardPage({ onBack }) {
     }
   }, [games])
 
-  const ranked = aggregateByPlayer(games, difficultyFilter)
+  const ranked = aggregateByPlayer(games, difficultyFilter, rankBy)
 
   const getRankClass = (index) => {
     if (index === 0) return 'leaderboard-rank leaderboard-rank-gold'
@@ -257,23 +296,26 @@ function LeaderboardPage({ onBack }) {
             <path d="M12 2a2 2 0 0 1 2 2v1h2a2 2 0 0 1 2 2v1.17a4 4 0 0 1-1.17 2.83L16 11h2a2 2 0 0 1 2 2v1a2 2 0 0 1-2 2h-1.17A4 4 0 0 1 16 18.83V20h2v2H6v-2h2v-1.17A4 4 0 0 1 7.17 16H6a2 2 0 0 1-2-2v-1a2 2 0 0 1 2-2h2l-.83-.83A4 4 0 0 1 6.17 8V6a2 2 0 0 1 2-2h2V4a2 2 0 0 1 2-2h2zm0 2h-2v2h2V4zM8 6H6v1.17L6.83 8H8V6zm8 0h-2v2h1.17L18 7.17V6h-2zM8 12H6v1h2v-1zm10 0h-2v1h2v-1zm-8 4.83V18h4v-1.17A4 4 0 0 1 12 14a4 4 0 0 1-2 .83zM12 12a4 4 0 1 1 0 8 4 4 0 0 1 0-8z" />
           </svg>
         </div>
-        <p className="leaderboard-hero-text">Top players by wins</p>
+        <p className="leaderboard-hero-text">
+          Top players by {rankBy === 'winRate' ? 'win %' : 'wins'}
+        </p>
       </div>
 
-      <div className="leaderboard-controls" role="group" aria-label="Filter by difficulty">
-        <span className="leaderboard-filter-label">Difficulty</span>
-        <div className="leaderboard-filter-pills">
-          {DIFFICULTY_OPTIONS.map((d) => (
-            <button
-              key={d}
-              type="button"
-              className={`leaderboard-filter-pill ${difficultyFilter === d ? 'leaderboard-filter-pill-active' : ''}`}
-              onClick={() => setDifficultyFilter(d)}
-            >
-              {d}
-            </button>
-          ))}
-        </div>
+      <div className="leaderboard-filters">
+        <CustomDropdown
+          label="Difficulty"
+          ariaLabel="Filter by difficulty"
+          value={difficultyFilter}
+          onChange={setDifficultyFilter}
+          options={DIFFICULTY_OPTIONS.map((d) => ({ value: d, label: d }))}
+        />
+        <CustomDropdown
+          label="Rank by"
+          ariaLabel="Rank by metric"
+          value={rankBy}
+          onChange={setRankBy}
+          options={RANK_BY_OPTIONS.map((opt) => ({ value: opt.id, label: opt.label }))}
+        />
       </div>
 
       {error && (
@@ -284,75 +326,77 @@ function LeaderboardPage({ onBack }) {
 
       {loading ? (
         <p className="leaderboard-loading">Loading…</p>
-      ) : ranked.length === 0 ? (
+      ) : games.length === 0 ? (
         <p className="leaderboard-empty">No games yet. Play to appear here!</p>
+      ) : ranked.length === 0 ? (
+        <p className="leaderboard-empty">
+          {rankBy === 'winRate'
+            ? `No qualifying players yet. Players need at least ${MIN_GAMES_FOR_WIN_RATE} games to be ranked by Win %.`
+            : 'No players with a win yet for this filter. Win a game to join the board!'}
+        </p>
       ) : (
-        <ul className="leaderboard-list" role="list">
-          {ranked.map((row, index) => {
-            const isFirst = index === 0;
-            // Prefer the live profile (username + avatar) over the stale,
-            // denormalized values stored on each game row.
-            const liveProfile = profiles[row.user_id] || {};
-            const displayName = liveProfile.username || row.username;
-            const avatarUrl = liveProfile.avatar_url || null;
-            const initial = displayName ? displayName[0].toUpperCase() : '?';
+        <div className="leaderboard-board">
+          <div className="leaderboard-table-header" role="row" aria-label="Column headings">
+            <span className="leaderboard-th leaderboard-th-rank">Rank</span>
+            <span className="leaderboard-th leaderboard-th-player">Player</span>
+            <span className="leaderboard-th leaderboard-th-stat">Games</span>
+            <span className="leaderboard-th leaderboard-th-stat">Wins</span>
+            <span className="leaderboard-th leaderboard-th-stat">Win %</span>
+            <span className="leaderboard-th leaderboard-th-stat">Avg</span>
+          </div>
+          <ul className="leaderboard-list" role="list">
+            {ranked.map((row, index) => {
+              const isFirst = index === 0;
+              const liveProfile = profiles[row.user_id] || {};
+              const displayName = liveProfile.username || row.username;
+              const avatarUrl = liveProfile.avatar_url || null;
+              const initial = displayName ? displayName[0].toUpperCase() : '?';
 
-            return (
-              <li
-                key={row.user_id}
-                className={`leaderboard-card ${isFirst ? 'leaderboard-card-first' : ''}`}
-              >
-                <div className="leaderboard-rank-container">
-                  <span className={getRankClass(index)}>
-                    {index < 3 ? (
-                      <span className="leaderboard-medal" aria-hidden>
-                        {index === 0 ? '🥇' : index === 1 ? '🥈' : '🥉'}
-                      </span>
-                    ) : (
-                      index + 1
-                    )}
-                  </span>
-                </div>
-                
-                <div className={`leaderboard-avatar ${isFirst ? 'leaderboard-avatar-first' : ''}`}>
-                  {avatarUrl ? (
-                    <img
-                      src={avatarUrl}
-                      alt={`${displayName} avatar`}
-                      className="leaderboard-avatar-image"
-                    />
-                  ) : (
-                    <span>{initial}</span>
-                  )}
-                </div>
-
-                <div className="leaderboard-card-body">
-                  <span className="leaderboard-username">{displayName}</span>
-                  <div className="leaderboard-stats">
-                    <div className="leaderboard-stat-item">
-                      <span className="leaderboard-stat-label">Games Played</span>
-                      <span className="leaderboard-stat-value">{row.totalGames}</span>
-                    </div>
-                    <div className="leaderboard-stat-item">
-                      <span className="leaderboard-stat-label">Wins</span>
-                      <span className="leaderboard-stat-value">{row.wins}</span>
-                    </div>
-                    <div className="leaderboard-stat-item">
-                      <span className="leaderboard-stat-label">Win Rate</span>
-                      <span className="leaderboard-stat-value">{row.winRate.toFixed(0)}%</span>
-                    </div>
-                    <div className="leaderboard-stat-item">
-                      <span className="leaderboard-stat-label">Avg Guesses</span>
-                      <span className="leaderboard-stat-value">
-                        {row.avgGuesses != null ? row.avgGuesses.toFixed(1) : '—'}
-                      </span>
-                    </div>
+              return (
+                <li
+                  key={row.user_id}
+                  className={`leaderboard-card leaderboard-row-grid ${isFirst ? 'leaderboard-card-first' : ''}`}
+                >
+                  <div className="leaderboard-rank-container">
+                    <span className={getRankClass(index)}>
+                      {index < 3 ? (
+                        <span className="leaderboard-medal" aria-hidden>
+                          {index === 0 ? '🥇' : index === 1 ? '🥈' : '🥉'}
+                        </span>
+                      ) : (
+                        index + 1
+                      )}
+                    </span>
                   </div>
-                </div>
-              </li>
-            )
-          })}
-        </ul>
+
+                  <div className="leaderboard-player-cell">
+                    <div className={`leaderboard-avatar ${isFirst ? 'leaderboard-avatar-first' : ''}`}>
+                      {avatarUrl ? (
+                        <img
+                          src={avatarUrl}
+                          alt={`${displayName} avatar`}
+                          className="leaderboard-avatar-image"
+                        />
+                      ) : (
+                        <span aria-hidden>{initial}</span>
+                      )}
+                    </div>
+                    <span className="leaderboard-username">{displayName}</span>
+                  </div>
+
+                  <span className="leaderboard-stat-value leaderboard-stat-numeric">{row.totalGames}</span>
+                  <span className="leaderboard-stat-value leaderboard-stat-numeric">{row.wins}</span>
+                  <span className="leaderboard-stat-value leaderboard-stat-numeric">
+                    {row.winRate.toFixed(0)}%
+                  </span>
+                  <span className="leaderboard-stat-value leaderboard-stat-numeric">
+                    {row.avgGuesses != null ? row.avgGuesses.toFixed(1) : '—'}
+                  </span>
+                </li>
+              )
+            })}
+          </ul>
+        </div>
       )}
     </main>
   )

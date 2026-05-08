@@ -8,6 +8,7 @@
   justify-content: flex-start;
   padding: 16px;
   box-sizing: border-box;
+  background-color: var(--color-background);
 }
 
 .faq-header {
@@ -18,17 +19,16 @@
 }
 
 .faq-back-icon {
-  background: none;
-  border: none;
+  background: transparent;
+  border: 1px solid var(--color-border-light);
+  border-radius: 8px;
   cursor: pointer;
   padding: 8px 12px;
-  border-radius: 8px;
   color: var(--color-text-secondary);
-  font-weight: 600;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: background-color 150ms ease-out, color 150ms ease-out;
+  transition: all 150ms ease-out;
 }
 
 .faq-back-icon:hover {
@@ -122,7 +122,7 @@
 }
 
 .faq-accordion-item {
-  background-color: #ffffff;
+  background-color: var(--color-surface);
   border: 0.5px solid var(--color-border-light);
   border-radius: 14px;
   overflow: hidden;
@@ -146,7 +146,7 @@
 }
 
 .faq-accordion-header:hover {
-  background-color: #fcfcfc;
+  background-color: var(--color-border-light);
 }
 
 .faq-accordion-icon {
