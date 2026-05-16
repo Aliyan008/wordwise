@@ -1,0 +1,71 @@
+.word-logo {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 14px;
+}
+
+.word-logo-tiles {
+  position: relative;
+  width: 72px;
+  height: 72px;
+  margin-bottom: 28px;
+  flex-shrink: 0;
+}
+
+.word-logo-tile {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Nunito', sans-serif;
+  font-weight: 900;
+  color: #ffffff;
+  user-select: none;
+}
+
+.word-logo-tile-large {
+  width: 72px;
+  height: 72px;
+  border-radius: 14px;
+  background-color: #f97316;
+  font-size: 40px;
+  transform: rotate(-6deg);
+  box-shadow: 0 8px 24px rgba(249, 115, 22, 0.3);
+  position: relative;
+  z-index: 1;
+}
+
+.word-logo-tile-small {
+  position: absolute;
+  right: -14px;
+  bottom: -14px;
+  width: 44px;
+  height: 44px;
+  border-radius: 10px;
+  background-color: #ee9800;
+  font-size: 24px;
+  transform: rotate(12deg);
+  z-index: 2;
+}
+
+.word-logo-text {
+  display: flex;
+  flex-direction: column;
+  line-height: 1;
+}
+
+.word-logo-word,
+.word-logo-wise {
+  font-family: 'Nunito', sans-serif;
+  font-weight: 900;
+  font-size: 32px;
+  line-height: 1;
+}
+
+.word-logo-word {
+  color: var(--ww-text);
+}
+
+.word-logo-wise {
+  color: #f97316;
+}

@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { supabase } from '../supabaseClient'
 import { authService } from '../services/authService'
+import { useAuth } from '../context/AuthContext.jsx'
 import CustomDropdown from '../components/CustomDropdown'
 import './LeaderboardPage.css'
 
@@ -150,6 +151,7 @@ function aggregateByPlayer(games, difficultyFilter, rankBy) {
 }
 
 function LeaderboardPage({ onBack }) {
+  const { user } = useAuth() || {}
   const [games, setGames] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
@@ -297,7 +299,7 @@ function LeaderboardPage({ onBack }) {
           </svg>
         </div>
         <p className="leaderboard-hero-text">
-          Top players by {rankBy === 'winRate' ? 'win %' : 'wins'}
+          TOP PLAYERS BY {rankBy === 'winRate' ? 'WIN %' : 'WINS'}
         </p>
       </div>
 
@@ -347,6 +349,7 @@ function LeaderboardPage({ onBack }) {
           <ul className="leaderboard-list" role="list">
             {ranked.map((row, index) => {
               const isFirst = index === 0;
+              const isSelf = user?.id && row.user_id === user.id;
               const liveProfile = profiles[row.user_id] || {};
               const displayName = liveProfile.username || row.username;
               const avatarUrl = liveProfile.avatar_url || null;
@@ -355,13 +358,15 @@ function LeaderboardPage({ onBack }) {
               return (
                 <li
                   key={row.user_id}
-                  className={`leaderboard-card leaderboard-row-grid ${isFirst ? 'leaderboard-card-first' : ''}`}
+                  className={`leaderboard-card leaderboard-row-grid${isFirst ? ' leaderboard-card-first' : ''}${isSelf ? ' leaderboard-card-self' : ''}`}
                 >
                   <div className="leaderboard-rank-container">
                     <span className={getRankClass(index)}>
-                      {index < 3 ? (
+                      {isFirst ? (
+                        '#1 ★'
+                      ) : index < 3 ? (
                         <span className="leaderboard-medal" aria-hidden>
-                          {index === 0 ? '🥇' : index === 1 ? '🥈' : '🥉'}
+                          {index === 1 ? '🥈' : '🥉'}
                         </span>
                       ) : (
                         index + 1
@@ -385,7 +390,7 @@ function LeaderboardPage({ onBack }) {
                   </div>
 
                   <span className="leaderboard-stat-value leaderboard-stat-numeric">{row.totalGames}</span>
-                  <span className="leaderboard-stat-value leaderboard-stat-numeric">{row.wins}</span>
+                  <span className="leaderboard-stat-value leaderboard-stat-numeric leaderboard-stat-wins">{row.wins}</span>
                   <span className="leaderboard-stat-value leaderboard-stat-numeric">
                     {row.winRate.toFixed(0)}%
                   </span>

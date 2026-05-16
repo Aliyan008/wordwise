@@ -15,7 +15,7 @@ body {
 body {
   min-width: 320px;
   min-height: 100vh;
-  font-family: var(--font-family-base);
+  font-family: 'Nunito Sans', sans-serif;
   line-height: 1.5;
   font-weight: 400;
   background-color: var(--color-background);

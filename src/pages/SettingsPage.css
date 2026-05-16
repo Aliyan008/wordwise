@@ -8,48 +8,60 @@
   justify-content: flex-start;
   padding: 16px;
   box-sizing: border-box;
-  background-color: var(--color-background);
+  background-color: var(--ww-bg);
+  color: var(--ww-text);
 }
 
 .settings-header {
   display: flex;
   align-items: center;
-  gap: 16px;
+  gap: 12px;
   margin-bottom: 24px;
+  max-width: 500px;
+  width: 100%;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 .settings-back-button {
   background: transparent;
-  border: 1px solid var(--color-border-light);
-  border-radius: 8px;
+  border: none;
+  border-radius: 10px;
   cursor: pointer;
-  padding: 8px 12px;
-  color: var(--color-text-secondary);
+  padding: 8px;
+  color: var(--ww-text);
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: all 150ms ease-out;
+  transition: background-color 150ms ease-out, transform 150ms ease-out;
 }
 
 .settings-back-button:hover {
-  background-color: var(--color-border-light);
-  color: var(--color-text-primary);
+  background-color: var(--ww-surface-high);
+  transform: translateX(-2px);
 }
 
 .settings-title {
   margin: 0;
-  font-size: 1.5rem;
-  font-weight: 700;
-  color: var(--color-text-primary);
+  font-family: 'Nunito', sans-serif;
+  font-size: 28px;
+  font-weight: 800;
+  color: var(--ww-orange);
+  letter-spacing: -0.02em;
 }
 
 .settings-card {
-  max-width: 600px;
+  max-width: 500px;
   width: 100%;
   margin: 0 auto;
   display: flex;
   flex-direction: column;
-  gap: 32px;
+}
+
+.settings-content {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
 }
 
 .settings-section {
@@ -58,35 +70,41 @@
 }
 
 .settings-section-card {
-  background-color: var(--color-surface);
-  border: 1px solid var(--color-border-light);
-  border-radius: 16px;
+  background-color: var(--ww-surface-low);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 14px;
+  padding: 24px;
   overflow: hidden;
 }
 
 .settings-card-header {
-  padding: 16px 20px;
-  border-bottom: 1px solid var(--color-border-light);
+  padding: 0 0 16px;
+  border-bottom: none;
 }
 
 .settings-section-title {
   margin: 0;
-  font-size: 0.75rem;
+  font-family: 'Nunito Sans', sans-serif;
+  font-size: 12px;
   font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.05em;
-  color: var(--color-text-secondary);
+  letter-spacing: 0.12em;
+  color: var(--ww-orange);
+  opacity: 0.8;
 }
 
 .settings-item {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 16px 20px;
+  padding: 16px 0;
+  border-bottom: 1px solid var(--ww-surface-highest);
 }
 
-.settings-item:not(:last-child) {
-  border-bottom: 1px solid var(--color-border-light);
+.settings-item:last-child,
+.settings-item-last {
+  border-bottom: none;
+  padding-bottom: 0;
 }
 
 .settings-item-stacked {
@@ -100,9 +118,10 @@
 }
 
 .settings-label {
-  font-size: 0.95rem;
-  font-weight: 600;
-  color: var(--color-text-primary);
+  font-family: 'Nunito Sans', sans-serif;
+  font-size: 17px;
+  font-weight: 400;
+  color: var(--ww-text);
   margin: 0;
 }
 
@@ -119,19 +138,19 @@
 }
 
 .settings-lives-message {
-  margin-top: -4px; /* Pull it slightly closer to the lives selector */
+  margin-top: 4px;
   font-size: 0.8rem;
   font-style: italic;
   font-weight: 700;
-  color: var(--color-text-secondary);
+  color: var(--ww-text-muted);
   align-self: flex-end;
   text-align: right;
 }
 
 .settings-lives-cheat {
-  color: #FF6B1A; /* Match primary orange */
+  color: var(--ww-orange);
 }
 
 .settings-lives-brave {
-  color: #4CAF82; /* Match secondary green */
+  color: var(--ww-green);
 }

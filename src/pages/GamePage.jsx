@@ -344,11 +344,23 @@ function GamePage({ onBack }) {
 
   const livesRemaining = Math.max(maxGuesses - guesses.length, 0)
 
+  const decoLetters = ['W', 'E', 'R', 'D', 'S', 'A', 'L']
+  const decoClasses = ['w', 'e', 'r', 'd', 's', 'a', 'l']
+
   return (
     <main className="game-page">
+      {decoLetters.map((letter, i) => (
+        <div
+          key={letter}
+          className={`game-page-deco game-page-deco--${decoClasses[i]}`}
+          aria-hidden
+        >
+          {letter}
+        </div>
+      ))}
       <div className="game-container">
         <div className="game-inner">
-          <header className="game-header" style={{ flexDirection: 'column', alignItems: 'center' }}>
+          <header className="game-header">
             <button
               onClick={onBack}
               aria-label="Back to home"
@@ -358,27 +370,25 @@ function GamePage({ onBack }) {
                 <path d="M15 18l-6-6 6-6" />
               </svg>
             </button>
-            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px' }}>
-              <h1 style={{ margin: 0, fontSize: '1.25rem', fontWeight: 800, color: 'var(--color-text-primary)', letterSpacing: '0.02em' }}>
-                WordWise • Daily
+            <div className="game-header-text">
+              <h1 className="game-title">
+                WordWise • <span className="game-title-accent">Daily</span>
               </h1>
-              <p style={{ margin: 0, fontSize: '0.75rem', textTransform: 'uppercase', color: 'var(--color-text-secondary)', fontWeight: 600, letterSpacing: '0.05em' }}>
+              <p className="game-subtitle">
                 {difficulty} • {maxGuesses} guesses
               </p>
             </div>
             {/* TODO: Implement logic to only show this badge if the user hasn't played today's word yet */}
-            <span style={{ position: 'absolute', right: 0, top: '50%', transform: 'translateY(-50%)', backgroundColor: '#FF6B1A', color: '#fff', fontSize: '0.7rem', fontWeight: 700, padding: '4px 10px', borderRadius: '999px', textTransform: 'uppercase' }}>
-              New
-            </span>
+            <span className="game-new-badge">New</span>
           </header>
 
-          <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '8px' }}>
+          <div className="game-lives-row">
             <LivesDisplay lives={livesRemaining} maxLives={maxGuesses} />
           </div>
 
           <section className="game-grid">
             {rows.map(({ guess, statusRow, isCurrent }, rowIdx) => (
-              <div key={rowIdx} className="game-row">
+              <div key={rowIdx} className={`game-row${isCurrent ? ' game-row-current' : ''}`}>
                 {Array.from({ length: 5 }, (_, colIdx) => {
                   const letter =
                     isCurrent && currentGuess[colIdx]
@@ -397,10 +407,10 @@ function GamePage({ onBack }) {
                         className={`game-tile-inner status-${status}`}
                         style={{ transitionDelay: `${colIdx * 150}ms` }}
                       >
-                        <div className="game-tile-front border flex items-center justify-center text-lg font-bold rounded-md">
+                        <div className="game-tile-front">
                           {letter}
                         </div>
-                        <div className="game-tile-back border flex items-center justify-center text-lg font-bold rounded-md">
+                        <div className="game-tile-back">
                           {letter}
                         </div>
                       </div>
@@ -411,14 +421,14 @@ function GamePage({ onBack }) {
             ))}
           </section>
 
-          <section className="mt-4 flex flex-col items-center gap-2 w-full px-1 sm:w-auto sm:px-0">
+          <section className="game-keyboard-section">
             {message && (
-              <p className="mb-2 text-xs font-semibold text-[color:var(--color-error)]">
+              <p className="game-message">
                 {message}
               </p>
             )}
             {KEYBOARD_ROWS.map((row) => (
-              <div key={row} className="flex justify-center w-full sm:w-auto gap-2">
+              <div key={row} className="game-keyboard-row">
                 {row === 'ZXCVBNM' && (
                   <button
                     className="game-key game-key-enter"
@@ -456,25 +466,14 @@ function GamePage({ onBack }) {
           </section>
 
           {gameStatus !== 'playing' && (
-            <section className="mt-4 text-center space-y-2">
-              <p className="text-lg font-semibold">
+            <section className="game-over">
+              <p className="game-over-title">
                 {gameStatus === 'won' ? 'Nice! You got it.' : 'Good try!'}
               </p>
-              <p className="text-sm text-[color:var(--color-text-secondary)]">
-                The word was{' '}
-                <span className="font-mono font-bold text-[color:var(--color-primary)]">
-                  {solution}
-                </span>
-                .
+              <p className="game-over-word">
+                The word was <strong>{solution}</strong>.
               </p>
-              <button
-                onClick={resetGame}
-                className="mt-2 inline-flex items-center justify-center px-4 py-2 rounded-full text-sm font-semibold shadow-md"
-                style={{
-                  backgroundColor: 'var(--color-primary)',
-                  color: '#ffffff',
-                }}
-              >
+              <button type="button" onClick={resetGame} className="game-play-again">
                 Play again
               </button>
             </section>

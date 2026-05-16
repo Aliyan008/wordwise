@@ -378,7 +378,7 @@ function ProfilePage({ onBack }) {
               )}
             </div>
             <button className="profile-avatar-edit-btn" onClick={handleAvatarClick} aria-label="Edit Avatar">
-              <Pencil size={14} color="#FF6B1A" strokeWidth={2.5} />
+              <Pencil size={14} color="#ffffff" strokeWidth={2.5} />
             </button>
             <input 
               type="file" 
@@ -427,7 +427,7 @@ function ProfilePage({ onBack }) {
         <div className="profile-section-separator"></div>
 
         <div>
-          <h3 className="profile-section-title">Your Battle Record</h3>
+          <h3 className="profile-section-title">Battle Record</h3>
           <div className="profile-stats-grid">
             <div className="profile-stat-card">
               <div className="profile-stat-label"><Gamepad2 size={16} color="#FF6B1A" /> Games Played</div>
@@ -473,11 +473,11 @@ function ProfilePage({ onBack }) {
         <div>
           <div className="profile-actions-card">
             {!isEmailUser ? (
-              <p style={{ color: 'var(--color-text-secondary)', fontSize: '14px', textAlign: 'center', margin: 0 }}>
+              <p className="profile-managed-note">
                 Account managed via Google
               </p>
             ) : (
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+              <div className="profile-password-actions">
                 <button
                   type="button"
                   className="profile-reset-button"
@@ -506,8 +506,8 @@ function ProfilePage({ onBack }) {
           <div className="profile-modal-content" onClick={(e) => e.stopPropagation()}>
             <h2 className="profile-modal-title">Change Password</h2>
             
-            <form onSubmit={handlePasswordChange} style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-              {resetError && <p style={{ color: '#EF4444', fontSize: '13px', margin: 0 }}>{resetError}</p>}
+            <form onSubmit={handlePasswordChange} className="profile-modal-form">
+              {resetError && <p className="profile-modal-error">{resetError}</p>}
               
               <input
                 type="password"
@@ -540,7 +540,6 @@ function ProfilePage({ onBack }) {
                 type="submit"
                 className="profile-modal-submit"
                 disabled={resetLoading || !currentPassword || !newPassword || !confirmPassword}
-                style={{ marginTop: '8px' }}
               >
                 {resetLoading ? 'Updating...' : 'Update Password'}
               </button>

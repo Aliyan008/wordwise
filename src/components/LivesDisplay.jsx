@@ -13,8 +13,8 @@ function LivesDisplay({ lives, maxLives }) {
               key={index}
               size={24}
               className={`heart ${isAlive ? 'heart-full' : 'heart-empty'}`}
-              color={isAlive ? '#FF6B1A' : '#e0e0e0'}
-              fill={isAlive ? '#FF6B1A' : 'none'}
+              color={isAlive ? 'var(--ww-orange)' : 'rgba(255,255,255,0.2)'}
+              fill={isAlive ? 'var(--ww-orange)' : 'none'}
               strokeWidth={isAlive ? 2 : 1.75}
               aria-hidden
             />

@@ -1,8 +1,19 @@
 import './LandingPage.css'
-import CustomButton from '../components/CustomButton'
+import WordLogo from '../components/WordLogo'
 import CustomDialog from '../components/CustomDialog'
+import CustomButton from '../components/CustomButton'
 import { useAuth } from '../context/AuthContext.jsx'
 import { useState } from 'react'
+
+const FLOATING_LETTERS = [
+  { letter: 'W', className: 'landing-deco--tl' },
+  { letter: 'E', className: 'landing-deco--tc' },
+  { letter: 'R', className: 'landing-deco--tr' },
+  { letter: 'D', className: 'landing-deco--ml' },
+  { letter: 'S', className: 'landing-deco--mr' },
+  { letter: 'A', className: 'landing-deco--bl' },
+  { letter: 'L', className: 'landing-deco--br' },
+]
 
 function LandingPage({ onNavigate }) {
   const { profile, signOut } = useAuth() || {}
@@ -40,7 +51,14 @@ function LandingPage({ onNavigate }) {
 
   return (
     <main className="landing">
-      <div className="landing-top-bar">
+      <div className="landing-bg-dots" aria-hidden />
+      {FLOATING_LETTERS.map(({ letter, className }) => (
+        <div key={letter} className={`landing-deco ${className}`} aria-hidden>
+          {letter}
+        </div>
+      ))}
+
+      <div className="landing-avatar-corner">
         {!profile && (
           <button
             type="button"
@@ -88,67 +106,54 @@ function LandingPage({ onNavigate }) {
           </div>
         )}
       </div>
-      <section className="landing-card">
-        <header className="landing-header">
-          <div className="title-group">
-            <h1 className="app-title">
-              <span className="title-tile">W</span>
-              <span className="title-text">ord</span>
-              <span className="title-tile">W</span>
-              <span className="title-text">ise</span>
-            </h1>
-          </div>
-        </header>
 
-        <section className="landing-main">
-          <div className="actions">
-            <CustomButton 
-              variant="primary" 
-              fullWidth
-              onClick={() => onNavigate?.('game')}
+      <div className="landing-content">
+        <WordLogo />
+
+        <p className="landing-tagline">A word game for kids who love words</p>
+
+        <div className="landing-sample-tiles">
+          <div className="landing-sample-tile landing-sample-tile-w">W</div>
+          <div className="landing-sample-tile landing-sample-tile-o">O</div>
+          <div className="landing-sample-tile landing-sample-tile-r">R</div>
+          <div className="landing-sample-tile landing-sample-tile-d">D</div>
+        </div>
+
+        <div className="landing-actions">
+          <button type="button" className="landing-btn-play" onClick={() => onNavigate?.('game')}>
+            ▶ Play
+          </button>
+
+          <div className="landing-btn-row">
+            <button
+              type="button"
+              className="landing-btn-secondary"
+              onClick={() => onNavigate?.('leaderboard')}
             >
-              Play
-            </CustomButton>
-
-            <div className="button-pair">
-              <CustomButton 
-                variant="primary"
-                onClick={() => onNavigate?.('leaderboard')}
-              >
-                Leaderboard
-              </CustomButton>
-              <CustomButton 
-                variant="primary"
-                onClick={() => onNavigate?.('settings')}
-              >
-                Settings
-              </CustomButton>
-            </div>
-
-            <CustomButton 
-              variant="ghost" 
-              fullWidth
-              onClick={() => onNavigate?.('faq')}
+              <span className="material-symbols-outlined" aria-hidden>military_tech</span>
+              Leaderboard
+            </button>
+            <button
+              type="button"
+              className="landing-btn-secondary"
+              onClick={() => onNavigate?.('settings')}
             >
-              FAQ
-            </CustomButton>
+              <span className="material-symbols-outlined" aria-hidden>settings</span>
+              Settings
+            </button>
           </div>
-        </section>
 
-        <section className="landing-preview">
-          <div className="preview-tiles">
-            <div className="preview-tile">W</div>
-            <div className="preview-tile preview-tile-present">O</div>
-            <div className="preview-tile preview-tile-correct">R</div>
-            <div className="preview-tile">D</div>
-          </div>
-          <p className="landing-footer-text">Made for kids who love words.</p>
-        </section>
-      </section>
+          <button type="button" className="landing-faq-link" onClick={() => onNavigate?.('faq')}>
+            FAQ
+          </button>
+        </div>
+
+        <p className="landing-caption">Made for kids who love words.</p>
+      </div>
 
       <CustomDialog isOpen={isLogoutConfirmOpen} title="Log out?">
         <p className="landing-logout-desc">
-          You'll need to sign in again to access your profile and stats.
+          You&apos;ll need to sign in again to access your profile and stats.
         </p>
         <div className="landing-logout-actions">
           <CustomButton
@@ -173,4 +178,6 @@ function LandingPage({ onNavigate }) {
 }
 
 export default LandingPage
+
+
 

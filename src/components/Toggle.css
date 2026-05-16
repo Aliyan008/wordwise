@@ -9,7 +9,7 @@
 .toggle-label {
   font-size: 0.95rem;
   font-weight: 600;
-  color: var(--color-text-primary);
+  color: var(--ww-text);
   cursor: pointer;
   user-select: none;
 }
@@ -26,7 +26,7 @@
 }
 
 .toggle:focus-visible {
-  outline: 2px solid var(--color-primary);
+  outline: 2px solid var(--ww-orange);
   outline-offset: 2px;
   border-radius: 28px;
 }
@@ -36,7 +36,7 @@
   position: relative;
   width: 100%;
   height: 100%;
-  background-color: #e2e8f0; /* Gray when off */
+  background-color: var(--ww-surface-highest);
   border-radius: 28px;
   transition: background-color 200ms ease-in-out;
 }
@@ -51,11 +51,11 @@
   background-color: #ffffff;
   border-radius: 50%;
   transition: transform 200ms ease-in-out;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 
 .toggle-checked .toggle-slider {
-  background-color: #FF6B1A; /* Orange when on */
+  background-color: var(--ww-orange);
 }
 
 .toggle-checked .toggle-knob {

@@ -50,17 +50,19 @@ function SettingsPage({ onBack }) {
   const applyDarkMode = (isDark) => {
     const root = document.documentElement
     if (isDark) {
-      root.style.setProperty('--color-background', '#1a1a1a')
-      root.style.setProperty('--color-surface', '#2d2d2d')
-      root.style.setProperty('--color-text-primary', '#f1f5f9')
-      root.style.setProperty('--color-text-secondary', '#94a3b8')
-      root.style.setProperty('--color-border-light', '#404040')
+      root.style.setProperty('--color-background', '#0e1225')
+      root.style.setProperty('--color-surface', '#1b1f31')
+      root.style.setProperty('--color-text-primary', '#dee1fb')
+      root.style.setProperty('--color-text-secondary', '#e0c0b1')
+      root.style.setProperty('--color-border-light', 'rgba(255,255,255,0.08)')
+      document.documentElement.removeAttribute('data-theme')
     } else {
       root.style.setProperty('--color-background', '#f8fafc')
       root.style.setProperty('--color-surface', '#ffffff')
       root.style.setProperty('--color-text-primary', '#0f172a')
       root.style.setProperty('--color-text-secondary', '#475569')
       root.style.setProperty('--color-border-light', '#e2e8f0')
+      document.documentElement.setAttribute('data-theme', 'light')
     }
   }
 
@@ -140,7 +142,7 @@ function SettingsPage({ onBack }) {
                 </div>
               </div>
 
-              <div className="settings-item settings-item-stacked" style={{ borderBottom: 'none' }}>
+              <div className="settings-item settings-item-stacked settings-item-last">
                 <label className="settings-label">Number of lives</label>
                 <div className="settings-control">
                   <NumberSelector
@@ -164,7 +166,7 @@ function SettingsPage({ onBack }) {
             </div>
           </div>
 
-          <div className="settings-section" style={{ marginTop: '32px' }}>
+          <div className="settings-section">
             <div className="settings-section-card">
               <div className="settings-card-header">
                 <h2 className="settings-section-title">APPEARANCE</h2>

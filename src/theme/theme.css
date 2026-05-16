@@ -38,5 +38,35 @@
   --color-surface-dark: #2d2d2d;
   --color-text-primary-dark: #f1f5f9;
   --color-text-secondary-dark: #94a3b8;
+
+  /* WordWise Stitch design tokens */
+  --ww-bg: #0e1225;
+  --ww-surface: #1b1f31;
+  --ww-surface-low: #161b2d;
+  --ww-surface-high: #25293c;
+  --ww-surface-highest: #303448;
+  --ww-orange: #f97316;
+  --ww-orange-dim: #9d4300;
+  --ww-amber: #ee9800;
+  --ww-green: #49ac7f;
+  --ww-yellow: #ffb95f;
+  --ww-text: #dee1fb;
+  --ww-text-muted: #e0c0b1;
+  --ww-text-faint: rgba(222, 225, 251, 0.45);
+  --ww-border: rgba(255, 255, 255, 0.08);
+  --ww-error: #ffb4ab;
+}
+
+.light-mode,
+[data-theme="light"] {
+  --ww-bg: #f8fafc;
+  --ww-surface: #ffffff;
+  --ww-surface-low: #f1f5f9;
+  --ww-surface-high: #e2e8f0;
+  --ww-surface-highest: #cbd5e1;
+  --ww-text: #0f172a;
+  --ww-text-muted: #475569;
+  --ww-text-faint: rgba(15, 23, 42, 0.45);
+  --ww-border: rgba(0, 0, 0, 0.08);
 }
 
