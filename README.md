@@ -20,29 +20,37 @@ A word puzzle game inspired by Wordle, built with React and Supabase. Includes u
 
 ## Note on live demo
 
-This project runs on Supabase's free tier, which pauses the backend after a period of inactivity. If you're visiting the live site and authentication or the leaderboard isn't responding, the database may be paused and waking up, this can take a few seconds on the first request after inactivity.
+This project runs on Supabase's free tier, which pauses the backend after a period of inactivity. If you're visiting the live site and authentication or the leaderboard isn't responding, the database may be paused and waking up — this can take a few seconds on the first request after inactivity.
 
 ## Getting Started
 
 1. Clone the repo
-```bash
+
+   ```bash
    git clone https://github.com/Aliyan008/wordwise.git
    cd wordwise
-```
+   ```
 
 2. Install dependencies
-```bash
+
+   ```bash
    npm install
-```
+   ```
 
 3. Set up environment variables
 
    Create a `.env` file in the root directory with:
 
+   ```
+   VITE_SUPABASE_URL=your_supabase_project_url
+   VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
+   ```
+
 4. Run the development server
-```bash
+
+   ```bash
    npm run dev
-```
+   ```
 
 ## License
 
