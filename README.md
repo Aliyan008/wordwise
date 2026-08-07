@@ -1,16 +1,49 @@
-# React + Vite
+# WordWise
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A word puzzle game inspired by Wordle, built with React and Supabase. Includes user authentication, gameplay preferences, and a global leaderboard.
 
-Currently, two official plugins are available:
+**Live site:** [wordwise-orpin.vercel.app](https://wordwise-orpin.vercel.app/)
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## Features
 
-## React Compiler
+- Wordle-style word guessing gameplay
+- User authentication (sign up, log in, manage account)
+- Gameplay preferences saved per user
+- Global leaderboard tracking player performance
+- Automated testing and deployment via GitHub Actions
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## Tech Stack
 
-## Expanding the ESLint configuration
+- **Frontend:** React, JavaScript, CSS
+- **Backend / Database:** Supabase (PostgreSQL, Auth, Row Level Security)
+- **Deployment:** Vercel, with CI/CD via GitHub Actions
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+## Note on live demo
+
+This project runs on Supabase's free tier, which pauses the backend after a period of inactivity. If you're visiting the live site and authentication or the leaderboard isn't responding, the database may be paused and waking up, this can take a few seconds on the first request after inactivity.
+
+## Getting Started
+
+1. Clone the repo
+```bash
+   git clone https://github.com/Aliyan008/wordwise.git
+   cd wordwise
+```
+
+2. Install dependencies
+```bash
+   npm install
+```
+
+3. Set up environment variables
+
+   Create a `.env` file in the root directory with:
+
+4. Run the development server
+```bash
+   npm run dev
+```
+
+## License
+
+This project is for portfolio and demonstration purposes.
